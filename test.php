@@ -1,31 +1,30 @@
 <?php
 error_reporting(0);
 $success = true;
-if(isset($_POST['host']) and !empty($_POST['host']))
-    $host = $_POST['host'];
-else
-    $success = false;
-if(isset($_POST['port']) and !empty($_POST['port']))
-    $port = $_POST['port'];
-else
-    $success = false;
-if(isset($_POST['userName']) and !empty($_POST['userName']))
-    $userName = $_POST['userName'];
-else
-    $success = false;
-if(isset($_POST['password']) and !empty($_POST['password']))
-    $password = $_POST['password'];
-else
-    $success = false;
+
+function getPost($name, &$status) {
+    if(isset($_POST[$name]) and !empty($_POST[$name]))
+        return $_POST[$name];
+    else
+        $status = false;
+    return null;
+}
+
+$host = getPost('host', $success);
+$port = getPost('port', $success);
+$userName = getPost('userName', $success);
+$password = getPost('password', $success);
+
+$msg  = '';
 
 if($success){
     $con = new mysqli($host, $userName, $password,'',$port);
-    if(mysqli_connect_errno()) {
+    if($con->connect_errno) {
         $success = false;
+        $msg = $con->connect_error;
     }
     $con->close();
 }
-$msg  = '';
 if($success) {
     $msg = $host.','.$port.','.$userName.','.$password;
 }
