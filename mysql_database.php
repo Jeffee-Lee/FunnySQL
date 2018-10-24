@@ -144,12 +144,18 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
         font-size: 17px;
         line-height: 20px;
     }
-    /*#databases {*/
-        /*border: 1px solid #ccc;*/
-    /*}*/
-    .hot-container {
+    .btn {
         width: 100%;
-
+        text-align: center;
+    }
+    #submit-change {
+        margin: 20px;
+        text-align: center;
+    }
+    .database-table {
+        -webkit-border-radius: 10px;
+        -moz-border-radius: 10px;
+        border-radius: 10px;
     }
 </style>
 <body style="background: white;">
@@ -157,10 +163,12 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
         <button>确定</button>
         <button>取消</button></div></div>
 <div class="head">
+    <a href="<?php echo $domain.$path?>" class='tab-0'>
+        <img src="<?php echo $domain.$path?>res/mysql.png"  class="icon mysql" width="16px" height="16px">&nbsp;概述</a>
     <a href="mysql_database.php" class="tab-1 active">
-        <img src="http://10.242.8.182/phpMyAdmin/themes/pmahomme/img/s_db.png"  class="icon database">&nbsp;新建数据库</a>
-    <a href="#" class="tab-2">
-        <img src="http://10.242.8.182/phpMyAdmin/themes/pmahomme/img/s_db.png"  class="icon table">&nbsp;数据表
+        <img src="<?php echo $domain.$path?>res/database.png"  class="icon database" width="16px" height="16px">&nbsp;数据库</a>
+    <a href="mysql_table.php" class="tab-2">
+        <img src="<?php echo $domain.$path?>res/table.png"  class="icon table" width="16px" height="16px">&nbsp;数据表
     </a>
     <a href="#" class="tab-3">
         <img src="http://10.242.8.182/phpMyAdmin/themes/pmahomme/img/s_db.png" class="icon">&nbsp;数据库</a>
@@ -199,12 +207,8 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
             </form>
         </div></div>
     <div class="database-table"  id="fortest">
-<!--        <table id="databases">-->
-<!--            <thead><tr>-->
-<!--                <th>数据库名</th>-->
-<!--                <th>数据库编码</th></tr></thead>-->
-<!--        </table></div>-->
-        <button>dff</button>
+        <div class="btn"><button id="submit-change">提交</button>
+            <button id="refresh">刷新</button></div>
     <div></div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -236,57 +240,103 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
         $('.msg-body button:last-child').click(function () {
             $('.msg').hide();
         });
+
+        // 创建按钮点击
         $('.new-database-submit').click(function () {
             let name = $('input[name="newDatabaseName"]').val();
             let charset = $('select[name="db_collation"]').val();
-            if(name !== '')
-                location.reload();
-        })
-        $('#databases').DataTable({
-            'ajax': 'http://10.242.8.182/funnysql/lib/api/GetDatabases.php',
-            "paging": false,
-            'searching': false,
-            'info': false,
+            if(name !== '') {
+                $.ajax({
+                    url: '<?php echo $domain.$path;?>lib/Processing.php?type=1&databaseName=' + name + '&collationName=' + charset,
+                    dataType: 'json',
+                    success: function (data) {
+                        if(data.success) {
+                            alert(data.msg);
+                            location.reload();
+                        }
+                        else
+                            alert(data.msg);
+                    },
+                    error: function () {
+                        alert('发生未知错误！');
+                    }
+                });
+            }
+        });
+
+        let container = document.getElementById('fortest');
+        let hot = new Handsontable(container, {
+            fillHandle: false,
+            stretchH: 'all',
+            colHeaders: ['<b style="color: red">删除</b>', '数据库名', '数据库编码'],
+            columnSorting: {
+                indicator: true
+            },
+            columns: [
+                {
+                    type: 'checkbox',
+                    width: 30,
+                    className: 'htCenter',
+                },
+                {
+                    readOnly: true,
+                    className: 'htCenter',
+                },{
+                    readOnly: true,
+                    className: 'htCenter',
+                }
+            ]
         });
 
         $.ajax({
-            url: 'http://10.242.8.182/funnysql/lib/api/GetDatabases.php',
+            url: '<?php echo $domain.$path;?>lib/api/GetDatabases.php',
             dataType: 'json',
             success: function (data) {
                 data = data['data'];
-                let container = document.getElementById('fortest');
-                let hot = new Handsontable(container, {
-                    data: data,
-                    fillHandle: false,
-                    stretchH: 'all',
-                    colHeaders: ['<b style="color: red">删除</b>', '数据库名', '数据库编码'],
-                    columns: [
-                        {
-                            type: 'checkbox',
-                            width: 30,
-                            className: 'htCenter',
-                        },
-                        {
-                            readOnly: true,
-                            className: 'htCenter',
-                        },{
-                            readOnly: true,
-                            className: 'htCenter',
-                        }
-                    ]
-                });
+                hot.loadData(data);
                 hot.updateSettings({
-                   cells: function (row, col) {
-                       const no_editable = ['information_schema', 'mysql', 'performance_schema', 'sys'];
-                       let cellProperties = {};
-                       if(no_editable.indexOf(hot.getData()[row][col + 1]) !== -1)
+                    cells: function (row, col) {
+                        const no_editable = ['information_schema', 'mysql', 'performance_schema', 'sys'];
+                        let cellProperties = {};
+                        if(no_editable.indexOf(hot.getData()[row][col + 1]) !== -1)
+                        {
                             cellProperties.readOnly = true;
-                       return cellProperties;
-                   } 
+                            hot.getCell(row,col).style.backgroundColor = "#EEE";
+                        }
+                        return cellProperties;
+                    }
                 });
-                console.log(hot.countRows());
-
             }
+        });
+
+        $('#submit-change').click(function () {
+            let del = [];
+            for(let i = 0; i < hot.countRows(); i ++) {
+                if(hot.getData()[i][0]) {
+                    del.push(hot.getData()[i][1]);
+                }
+            }
+            if(del.length !== 0){
+                let r = confirm('确定删除数据库 ' + del + ' ?');
+                if(r === true) {
+                    $.ajax({
+                        url: '<?php echo $domain.$path;?>lib/Processing.php?type=2&databaseNamesList=' + del,
+                        dataType: 'json',
+                        success: function (data) {
+                            let msg = '';
+                            data.forEach(function (element) {
+                                element = JSON.parse(element);
+                                msg += element.msg + '\n';
+                            });
+                            alert(msg);
+                            location.reload();
+                        }
+                    });
+                }
+            }
+        });
+        $('#refresh').click(function () {
+            location.reload();
         });
     });
 </script>

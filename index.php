@@ -1,7 +1,7 @@
 <?php
 include('./lib/settings.php');
 if(!array_key_exists('funnysql', $_COOKIE))
-    header("Location: http://10.242.8.182/funnysql/login");
+    header("Location: ".$domain .$path."login");
 $con_info = explode(',', $_COOKIE['funnysql']);
 $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
 ?>
@@ -144,8 +144,10 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
         <button>确定</button>
         <button>取消</button></div></div>
 <div class="head">
+    <a href="<?php echo $domain.$path?>" class='tab-0 active'>
+        <img src="<?php echo $domain.$path?>res/mysql.png"  class="icon mysql" width="16px" height="16px">&nbsp;概述</a>
     <a href="mysql_database.php" class="tab-1">
-        <img src="http://10.242.8.182/phpMyAdmin/themes/pmahomme/img/s_db.png"  class="icon database">&nbsp;新建数据库</a>
+        <img src="<?php echo $domain.$path?>res/database.png"  class="icon database" width="16px" height="16px">&nbsp;数据库</a>
     <a href="#" class="tab-2">
         <img src="http://10.242.8.182/phpMyAdmin/themes/pmahomme/img/s_db.png"  class="icon table">&nbsp;数据表
     </a>
