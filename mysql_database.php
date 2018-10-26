@@ -126,14 +126,14 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
         float: right;
         width: 40%;
     }
-    .new-database-head{
+    .new-database-head, .table-head{
         background: #bbbbbb;
         color: #ffffff;
         padding: 9px;
         font-size: 20px;
         border-radius: 10px 10px 0 0;
     }
-    .new-database-body{
+    .new-database-body, .table-body{
         padding: 18px 0;
         background: #f3f3f3;
     }
@@ -206,10 +206,14 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
                 <button class="new-database-submit" style="margin-left: 12px;">创建</button>
             </form>
         </div></div>
-    <div class="database-table"  id="fortest">
-        <div class="btn"><button id="submit-change">提交</button>
-            <button id="refresh">刷新</button></div>
-    <div></div>
+    <div class="database-table" >
+        <div class="table-head">删除数据库</div>
+        <div class="table-body">
+            <div id="fortest"></div>
+            <div class="btn"><button id="submit-change">提交</button>
+                <button id="refresh">刷新</button></div>
+        </div>
+
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>

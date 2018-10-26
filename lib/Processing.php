@@ -12,5 +12,8 @@ if(isset($_GET['type']) and !empty($_GET['type']) ) {
         case '2':
             echo DeleteDatabase($_GET['databaseNamesList']);
             break;
+        case '3':
+            echo gettype($_GET['data']).' '.$_GET['data'].' '.(explode(',',$_GET['data'])[0] == '');
+            break;
     }
 }

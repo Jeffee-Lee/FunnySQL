@@ -20,6 +20,7 @@ function CreateDatabase($databaseName, $collationName) {
             $msg = '数据库'.$databaseName.'创建成功！';
         }
     }
+    $con->close();
     return json_encode(array('success'=>$success, 'msg'=>$msg));
 }
 
@@ -51,5 +52,6 @@ function DeleteDatabase($databaseNamesList) {
         }
         array_push($output, json_encode(array('success'=>$success, 'msg'=>$msg)));
     }
+    $con->close();
     return json_encode($output);
 }
