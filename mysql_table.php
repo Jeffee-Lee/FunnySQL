@@ -1,5 +1,5 @@
 <?php
-include('lib/settings.php');
+include('./lib/settings.php');
 if(!array_key_exists('funnysql', $_COOKIE))
     header("Location: ".$domain.$path."login");
 $con_info = explode(',', $_COOKIE['funnysql']);
@@ -13,11 +13,6 @@ $result = $con->query('SHOW DATABASES;');
 while($row = $result->fetch_assoc())
     array_push($databases, $row['Database']);
 $result->free_result();
-
-// 连接类型
-$type = '0';
-if (isset($_GET['t']))
-    $type = $_GET['t'];
 
 // 连接的数据库
 $dba = $databases[0];
@@ -38,9 +33,10 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>FunnySQL</title>
     <link rel="shortcut icon" href="<?php echo $domain.$path;?>res/favicon.png">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link href="<?php echo $domain.$path?>lib/handsontable/handsontable.full.min.css" rel="stylesheet" media="screen">
 </head>
 <style>
+    /*Public*/
     * {
         -webkit-box-sizing: border-box;
         -moz-box-sizing: border-box;
@@ -127,12 +123,66 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
     .msg-body button:first-child {
         margin-right: 30px;
     }
-
     .main {
         margin-top: 60px;
         width: 100%;
     }
 
+    /*Left Part*/
+    .left {
+        float: left;
+        width: 34.33%;
+        margin: 30px 20px;
+
+    }
+    .left-top, .left-bottom {
+        margin-bottom: 50px;
+        display: block;
+        border: 1px solid #e7eaed;
+        border-radius: 10px;
+    }
+    .left-top-head,.left-bottom-head {
+        background: #bbbbbb;
+        color: #ffffff;
+        padding: 9px;
+        font-size: 20px;
+        border-radius: 10px 10px 0 0;
+    }
+    .left-top-body,.left-bottom-body {
+        padding: 18px 0;
+        background: #f3f3f3;
+        text-align: center;
+    }
+    .input {
+        font-size: 17px;
+        vertical-align: middle;
+        height: 24px;
+    }
+    .create-table {
+        padding-top: 30px;
+    }
+
+    /*Right Part*/
+    .right {
+        float: right;
+        width: 58%;
+        display: block;
+        border: 1px solid #e7eaed;
+        margin: 30px 20px;
+        border-radius: 10px;
+    }
+    .right-head {
+        background: #bbbbbb;
+        color: #ffffff;
+        padding: 9px;
+        font-size: 20px;
+        border-radius: 10px 10px 0 0;
+    }
+    .right-body {
+        padding: 18px 0;
+        background: #f3f3f3;
+        text-align: center;
+    }
 </style>
 <body style="background: white;">
     <div class="msg"><div class="msg-head">确定离开？<a >X</a ></div><div class="msg-body">
@@ -147,364 +197,82 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
             <img src="<?php echo $domain.$path?>res/table.png"  class="icon table" width="16px" height="16px">&nbsp;数据表
         </a>
         <a href="#" class="tab-3">
-            <img src="http://10.242.8.182/phpMyAdmin/themes/pmahomme/img/s_db.png" class="icon">&nbsp;数据库</a>
+            <img src="" class="icon">&nbsp;数据库</a>
         <a href="#" class="tab-4">
-            <img src="http://10.242.8.182/phpMyAdmin/themes/pmahomme/img/s_db.png" class="icon ic_s_db">&nbsp;数据库</a>
+            <img src="" class="icon ic_s_db">&nbsp;数据库</a>
         <a href="#" class="tab-5">
-            <img src="http://10.242.8.182/phpMyAdmin/themes/pmahomme/img/s_db.png" class="icon ic_s_db">&nbsp;数据库</a>
+            <img src="" class="icon ic_s_db">&nbsp;数据库</a>
         <a href="#" class="tab-6">
-            <img src="http://10.242.8.182/phpMyAdmin/themes/pmahomme/img/s_db.png" class="icon ic_s_db">&nbsp;数据库</a>
+            <img src="" class="icon ic_s_db">&nbsp;数据库</a>
         <a href="#" class="exit">X</a>
     </div>
     <div class="main">
-        <?php if($type == '0') {?>
-        <link href="https://cdn.bootcss.com/handsontable/6.0.1/handsontable.full.css" rel="stylesheet" media="screen">
-        <style>
-            .left {
-                float: left;
-                width: 50%;
-                display: block;
-                border: 1px solid #e7eaed;
-                margin: 30px 20px;
-                border-radius: 10px;
-            }
-            .left-head {
-                background: #bbbbbb;
-                color: #ffffff;
-                padding: 9px;
-                font-size: 20px;
-                border-radius: 10px 10px 0 0;
-            }
-            .left-body {
-                padding: 18px 0;
-                background: #f3f3f3;
-            }
-            .select {
-                text-align: center;
-            }
-            select, input {
-                font-size: 17px;
-            }
-            .create-table {
-                padding-top: 30px;
-            }
-        </style>
+
         <div class="left">
-            <div class="left-head">新建数据表</div>
-            <div class="left-body">
-                <div class="select">
-                    <select name="select-database" id="select-database" title="选择数据库">
-                        <?php
-                        foreach ($databases as $value)
-                            echo '<option value="' . $value . '" > '.$value.'</option>';
-                        ?>
-                    </select>
-                    <input type="text" placeholder="新建数据表名" id="tableName" >
-                </div>
-                <div class="create-table">
-                    <div id="create"></div>
-                    <div class="btn" style="text-align: center; padding-top: 30px;">
-                        <button class="subBtn" id="addRow">添加一行</button>
-                        <button class="subBtn" id="removeRow">删除最后一行</button>
-                        <button class="subBtn" id="push">提交</button>
+            <div class="left-top">
+                <div class="left-top-head">新建数据表</div>
+                <div class="left-top-body">
+                    <div class="select">
+                        <select name="select-database" id="left-top-select-database" class="select-database input" title="选择数据库">
+                            <?php
+                            foreach ($databases as $value) {
+                                $output = '<option value="' . $value . '" ';
+                                if(!strcmp($value, $dba))
+                                    $output .= 'selected';
+                                $output .= '>'.$value.'</option>';
+                                echo $output;
+                            }
+                            ?>
+                        </select>
+                        <input type="text" placeholder="新建数据表名" id="tableName" class="input" >
+                    </div>
+                    <div class="create-table">
+                        <div id="create"></div>
+                        <div class="btn" style="text-align: center; padding-top: 30px;">
+                            <button class="subBtn" id="addRow">添加一行</button>
+                            <button class="subBtn" id="removeRow">删除最后一行</button>
+                            <button class="subBtn" id="push">提交</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <script src="https://cdn.bootcss.com/handsontable/6.0.1/handsontable.full.min.js"></script>
-        <script>
-            $(document).ready(function () {
-                let container = document.getElementById('create');
-                let hot = new Handsontable(container, {
-                    fillHandle: false,
-                    stretchH: 'all',
-                    colHeaders: ['名', '类型', '长度', '不是 null', '主键'],
-                    columns: [
-                        {
-                            type: 'text',
-                            className: 'htRight',
-                        },
-                        {
-                            type: 'autocomplete',
-                            source: ['BMW', 'Chrysler', 'Nissan', 'Suzuki', 'Toyota', 'Volvo'],
-                            strict: false,
-                            width: 50,
-                            className: 'htRight',
-                        },
-                        {
-                            type:  'numeric',
-                            width: 50,
-                            className: 'htRight',
-                        },
-                        {
-                            type: 'checkbox',
-                            width: 50,
-                            className: 'htCenter',
+            <div class="left-bottom">
+                <div class="left-bottom-head">删除数据表</div>
+                <div class="left-bottom-body">
 
-                        },
-                        {
-                            type: 'checkbox',
-                            width: 50,
-                            className: 'htCenter',
-                        }
-                    ]
-                });
-                $('#addRow').click(function () {
-                    hot.alter('insert_row', hot.countRows());
-                });
-                $('#removeRow').click(function () {
-                    hot.alter('remove_row', hot.countRows() - 1);
-                });
-                $('#push').click(function () {
-                    let db = $('#select-database').val();
-                    let tb = $('#tableName').val();
-                    if(tb === null || tb === '')
-                        alert('请输入新建数据表名！');
-                    else {
-                        let temp = hot.getData();
-                        let data = [];
-                        for(let i = 0; i < hot.countRows(); i++)
-                            if(temp[i][0] !== null && temp[i][1] !== null && temp[i][0] !== '' && temp[i][1] !== '')
-                                data.push(temp[i]);
-                        if(data.length === 0)
-                            alert('请检查输入数据表的结构！');
-                        else {
-                            function getMsg(msg,index) {
-                                let returnMsg = msg[index][0] + ' '+ msg[index][1];
-                                if(msg[index][2]!==null && msg[index][2]!=='')
-                                    returnMsg += '(' + msg[index][2] + ')';
-                                if(msg[index][3]===true)
-                                    returnMsg += ' Not Null ';
-                                if(msg[index][4]===true)
-                                    returnMsg += '主键';
-                                return returnMsg;
-                            }
-                            let msg = '确定在 '+db+' 创建表 '+tb+'\n'+'字段：\n';
-                            let count = 0;
-                            while(count < data.length) {
-                                msg += '    '+getMsg(data,count) + '\n';
-                                count ++;
-                            }
-                            alert(msg);
-                            $.ajax({
-                                url: '<?php echo $domain.$path;?>lib/Processing.php?type=3&data=' + data,
-                                dataType: 'text',
-                                success: function (data) {
-                                    console.log(data);
-                                }
-                            });
-                        }
-                    }
-
-
-                });
-            });
-        </script>
-
-        <?php } else { switch ($type) { case '1': ?>
-        <style>
-            .left {
-                float: left;
-                width: 50%;
-                display: block;
-                border: 1px solid #e7eaed;
-                margin: 30px 20px;
-                border-radius: 10px;
-            }
-            .left-head {
-                background: #bbbbbb;
-                color: #ffffff;
-                padding: 9px;
-                font-size: 20px;
-                border-radius: 10px 10px 0 0;
-            }
-            .left-body {
-                padding: 18px 0;
-                background: #f3f3f3;
-            }
-        </style>
-        <div class="left">
-            <div class="left-head">删除数据表</div>
-            <div class="left-body">
-                <div class="delete-table" style="text-align: center">
-                    <select name="databaseName" id="databaseName" title="选择数据库">
+                    <select name="select-table" id="left-bottom-select-table" class="input" title="选择删除的数据表名">
                         <?php
-                        foreach ($databases as $value)
-                            echo '<option value="' . $value . '" > '.$value.'</option>';
-                        ?>
-                    </select>
-                    <input type="text" placeholder="选择数据表" id="tableName" list="<?php echo $dba;?>">
-                    <?php
-                        foreach ($databases as $database) {
-                            echo '<datalist id="'.$database.'">';
-                            $result = $con->query('SHOW TABLES FROM '.$database);
-                            while($row = $result->fetch_assoc()) {
-                                echo '<option value="' . $row[sprintf('Tables_in_%s', $database)] . '" >';
-                            }
-                            echo '</datalist>';
-                            $result->free_result();
-                        }
-                    ?>
-                    <button id="delete">删除</button>
-                </div>
-            </div>
-        </div>
-        <script>
-            $(document).ready(function () {
-                $('#databaseName').blur(function () {
-                    let database = $('#databaseName').val();
-                    $('#tableName').val('');
-                    $('#tableName').attr('list',database);
-                });
-            });
-        </script>
-
-        <?php break; case '2':?>
-        <link href="https://cdn.bootcss.com/handsontable/6.0.1/handsontable.full.css" rel="stylesheet" media="screen">
-        <style>
-            .left {
-                float: left;
-                width: 50%;
-                display: block;
-                border: 1px solid #e7eaed;
-                margin: 30px 20px;
-                border-radius: 10px;
-            }
-            .left-head {
-                background: #bbbbbb;
-                color: #ffffff;
-                padding: 9px;
-                font-size: 20px;
-                border-radius: 10px 10px 0 0;
-            }
-            .left-body {
-                padding: 18px 0;
-                background: #f3f3f3;
-            }
-            select, input {
-                font-size: 16px;
-                padding: auto 20px;
-            }
-        </style>
-        <div class="left">
-            <div class="left-head">数据表数据操作</div>
-            <div class="left-body">
-                <div id="select" style="text-align: center">
-                    <select name="databaseName" id="databaseName" title="选择数据库">
-                        <?php
-                        foreach ($databases as $value) {
-                            $output = '<option value="' . $value . '" ';
-                            if(!strcmp($value, $dba))
-                                $output .= 'selected';
-                            $output .= ' > '.$value.'</option>';
-                            echo $output;
-                        }
-                        ?>
-                    </select>
-                    <input type="text" placeholder="选择数据表" id="tableName" list="<?php echo $dba;?>" value="<?php echo $tb;?>">
-                    <?php
-                    foreach ($databases as $database) {
-                        $output = '<datalist id="'.$database.'">';
-                        $result = $con->query('SHOW TABLES FROM '.$database);
+                        $result = $con->query('SHOW TABLES FROM '.$dba);
                         while($row = $result->fetch_assoc()) {
-                            $value = $row[sprintf('Tables_in_%s', $database)];
-                            $output .= '<option value="' .$value. '" ';
-                            if(!strcmp($value, $tb))
-                                $output .= 'selected ';
-                            $output .= '>';
+                            $value = $row[sprintf('Tables_in_%s',$dba)];
+                            echo '<option value="' . $value . '">'.$value.'</option>';
                         }
-                        $output .= '</datalist>';
-                        echo $output;
                         $result->free_result();
-                    }
-                    ?>
-                </div>
-                <div class="show">
-                    <div id="table"></div>
+                        ?>
+                    </select>
+                    <button id="left-bottom-delete">删除</button>
                 </div>
             </div>
-        </div>
-        <script src="https://cdn.bootcss.com/handsontable/6.0.1/handsontable.full.min.js"></script>
-        <script>
-            $(document).ready(function () {
-                $('#databaseName').blur(function () {
-                    let database = $('#databaseName').val();
-                    $('#tableName').val('');
-                    $('#tableName').attr('list',database);
-                });
-                $('#tableName').focus(function () {
-                    $(this).val('');
-                });
-                $('#tableName').blur(function () {
-                    if($(this).val() != null && $(this).val() !== '')
-                        location.href = '<?php echo $domain.$path?>mysql_table?t=2&db='+$('#databaseName').val()+'&tb='+$(this).val();
-                });
-                var data = [
-                    ["", "Ford", "Tesla", "Toyota", "Honda"],
-                    ["2017", 10, 11, 12, 13],
-                    ["2018", 20, 11, 14, 13],
-                    ["2019", 30, 15, 12, 13]
-                ];
-                var container = document.getElementById('table');
-                var hot = new Handsontable(container, {
-                    data: data,
-                    rowHeaders: true,
-                    colHeaders: true,
-                    filters: true,
-                    dropdownMenu: true
-                });
-            });
-        </script>
-        <?php break; default: echo "<script>window.location.href='".$domain.$path."mysql_table';</script>"; } }?>
 
-        <style>
-            .right {
-                float: right;
-                width: 40%;
-                display: block;
-                border: 1px solid #e7eaed;
-                margin: 30px 20px;
-                border-radius: 10px;
-            }
-            .right-head {
-                background: #bbbbbb;
-                color: #ffffff;
-                padding: 9px;
-                font-size: 20px;
-                border-radius: 10px 10px 0 0;
-            }
-            .right-body {
-                padding: 18px 0;
-                background: #f3f3f3;
-                text-align: center;
-            }
-            .right .btn {
-                margin: 10px 30px;
-            }
-        </style>
+        </div>
+        
         <div class="right">
-            <div class="right-head">其他操作</div>
-            <div class="right-body">
-                <a href="<?php echo $domain . $path ?>mysql_table?t=1">删除数据表</a>
-                <a href="<?php echo $domain . $path ?>mysql_table?t=2">查看表数据</a>
+            <div class="right-head"><?php echo $dba?></div>
+            <div class="right-body" >
+                <div id="showDetail"></div>
             </div>
         </div>
-        <script>
-            $(document).ready(function () {
-                $('#deleteTable').click(function () {
-                    location.href='<?php echo $domain.$path?>mysql_table?t=1';
-                });
-            });
-        </script>
+
+
     </div>
-
+    <script src="<?php echo $domain.$path?>lib/jquery.min.js"></script>
+    <script src="<?php echo $domain.$path?>lib/handsontable/handsontable.full.min.js"></script>
     <script src="https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-
     <script>
 
         $(document).ready(function(){
 
-            // language=JQuery-CSS
+            // Public
             $(".head > a").click(function () {
                 if($(this).nextAll().length !== 0) {
                     //不是最右边的关闭
@@ -525,7 +293,207 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
                 $('.msg').hide();
             });
 
+            // Left Part
+            let originalDb = '<?php echo $dba;?>';
+            let container = document.getElementById('create');
+            $('.select-database').blur(function () {
+                let db = $(this).val();
+                if(db !== originalDb)
+                    location.href = '<?php echo $domain.$path;?>mysql_table?db='+db;
+            });
+            let hot = new Handsontable(container, {
+                fillHandle: false,
+                stretchH: 'all',
+                colHeaders: ['名', '类型', '长度', '不是 null', '主键'],
+                minRows: 15,
+                height: 395,
+                columns: [
+                    {
+                        type: 'text',
+                        className: 'htRight',
+                        width: 40,
+                    },
+                    {
+                        editor: 'select',
+                        selectOptions:  ['TINYINT','SMALLINT','MEDIUMINT','INT','BIGINT','FLOAT','DOUBLE','DECIMAL',
+                            'CHAR','VARCHAR','TINYBLOB','TINYTEXT','BLOB','TEXT','MEDIUMBLOB','MEDIUMTEXT','LONGBLOB','LONGTEXT',
+                            'DATE','TIME','YEAR','DATETIME','TIMESTAMP'],
+                        width: 40,
+                        className: 'htRight',
+                    },
+                    {
+                        type:  'numeric',
+                        width: 40,
+                        className: 'htRight',
+                    },
+                    {
+                        type: 'checkbox',
+                        width: 30,
+                        className: 'htCenter',
 
+                    },
+                    {
+                        type: 'checkbox',
+                        width: 30,
+                        className: 'htCenter',
+                    }
+                ]
+            });
+            $('#addRow').click(function () {
+                hot.alter('insert_row', hot.countRows());
+            });
+            $('#removeRow').click(function () {
+                hot.alter('remove_row', hot.countRows() - 1);
+            });
+            $('#push').click(function () {
+                let db = $('#left-top-select-database').val();
+                let tb = $('#tableName').val();
+                if(tb === null || tb === '')
+                    alert('请输入新建数据表名！');
+                else {
+                    let temp = hot.getData();
+                    let data = [];
+                    for(let i = 0; i < hot.countRows(); i++)
+                        if(temp[i][0] !== null && temp[i][1] !== null && temp[i][0] !== '' && temp[i][1] !== '')
+                            data.push(temp[i]);
+                    let isValSize = true;
+                    data.forEach(function (each) {
+                        let size =each[2];
+                        const pattern = /^[1-9]\d*$/g;
+                        if(size !== null)
+                            if(!(pattern.test(size))) {
+                                isValSize = false;
+                                return 0;
+                            }
+                    });
+
+                    if(data.length === 0)
+                        alert('请检查输入数据表结构的输入！');
+                    else if(!isValSize)
+                        alert('长度只能为正整数！');
+                    else {
+                        function getMsg(msg,index) {
+                            let returnMsg = msg[index][0] + ' '+ msg[index][1];
+                            if(msg[index][2]!==null && msg[index][2]!=='')
+                                returnMsg += '(' + msg[index][2] + ')';
+                            if(msg[index][3]===true)
+                                returnMsg += ' Not Null ';
+                            if(msg[index][4]===true)
+                                returnMsg += '主键';
+                            return returnMsg;
+                        }
+                        let msg = '确定在 '+db+' 创建表 '+tb+'\n'+'字段：\n';
+                        let count = 0;
+                        while(count < data.length) {
+                            msg += '    '+getMsg(data,count) + '\n';
+                            count ++;
+                        }
+                        let r = confirm(msg);
+                        if(r)
+                            $.ajax({
+                                url: '<?php echo $domain.$path;?>lib/Processing.php?type=3&db=' + db + '&tb=' + tb + '&data=' + data,
+                                dataType: 'json',
+                                success: function (data) {
+                                    if(data.success) {
+                                        alert(data.msg);
+                                        loadDetailTable();
+                                        reloadSelectTable();
+                                    }
+                                    else
+                                        alert(data.msg);
+                                }
+                            });
+                    }
+                }
+
+
+            });
+            $('#left-bottom-delete').click(function () {
+                let tb = $('#left-bottom-select-table').val();
+                let db = '<?php echo $dba;?>';
+
+                let msg = '确定删除数据库'+db+'中的数据表'+tb;
+                if (confirm(msg)) {
+                    $.ajax({
+                        url: '<?php echo $domain . $path . "lib/Processing.php?type=4&db=" . $dba.'&tb=';?>'+tb,
+                        dataType: 'json',
+                        success: function (data) {
+                            if(data.success) {
+                                alert(data.msg);
+                                loadDetailTable();
+                                reloadSelectTable();
+                            }
+                            else
+                                alert(data.msg);
+                        }
+                    });
+                }
+            });
+            function reloadSelectTable() {
+                $.ajax({
+                    url: '<?php echo $domain.$path.'lib/Processing.php?type=6&db='.$dba;?>',
+                    dataType: 'json',
+                    success: function (data) {
+                        if(data.success) {
+                            $('#left-bottom-select-table').html(data.msg);
+                            loadDetailTable();
+                        }
+                        else
+                            alert(data.msg);
+                    }
+                })
+            }
+
+            // Right Part
+            let showDetail = document.getElementById('showDetail');
+            let detailTable = new Handsontable(showDetail, {
+                fillHandle: false,
+                stretchH: 'all',
+                readOnly: true,
+                colHeaders: true,
+                minRows: 20,
+                rowHeights: 30,
+                height: 630,
+                autoWrapRow: true,
+            });
+            function loadDetailTable(){
+                $.ajax({
+                    url: '<?php echo $domain.$path."lib/Processing.php?type=5&db=".$dba;?>',
+                    dataType: 'json',
+                    success: function (data) {
+                        if(data.success) {
+                            let colHeaders = data.colHeaders;
+                            let columns = data.columns;
+                            detailTable.updateSettings({
+                                colHeaders: colHeaders,
+                                columns: columns,
+                            });
+                            detailTable.loadData(data.data);
+                            $('.delete-table').click(function () {
+                                let tb = $(this).attr('tb');
+                                console.log('click');
+                                if(confirm('确定删除数据表'+ tb)) {
+                                    $.ajax({
+                                        url: '<?php echo $domain . $path . "lib/Processing.php?type=4&db=" . $dba.'&tb=';?>'+tb,
+                                        dataType: 'json',
+                                        success: function (data) {
+                                            if(data.success) {
+                                                alert(data.msg);
+                                                loadDetailTable();
+                                            }
+                                            else
+                                                alert(data.msg);
+                                        }
+                                    });
+                                }
+                            });
+                        } else {
+                            alert(data.msg);
+                        }
+                    },
+                });
+            }
+            loadDetailTable();
         });
     </script>
 </body>

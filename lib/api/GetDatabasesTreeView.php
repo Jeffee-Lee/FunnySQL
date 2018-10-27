@@ -8,8 +8,6 @@ while($row = $result->fetch_assoc())
     array_push($databaseName, $row['Database']);
 }
 $result-> free_result();
-$search = array('\/','\"','"{','}"','"[',']"');
-$replace = array('/','"','{','}','[',']');
 $output = array();
 foreach ($databaseName as $value)
 {
@@ -19,22 +17,15 @@ foreach ($databaseName as $value)
     {
         $name = $row[sprintf('Tables_in_%s', $value)];
 
-        $temp = json_encode(array('text'=> $name,'icon'=> './res/table.ico','a_attr'=> json_encode(array('id'=> 'table-'.$name))));
-        $temp = str_replace($search,$replace, $temp);
+        $temp = array('text'=> $name,'icon'=> './res/table.ico','a_attr'=> array('id'=> 'table-'.$value.'-'.$name));
         array_push($children, $temp);
 
     }
-    $temp = json_encode($children, JSON_UNESCAPED_SLASHES);
-    $temp = str_replace($search,$replace, $temp);
-
     $result->free_result();
-//    $result = json_encode(array('text'=> $value, 'icon'=>'./res/database.ico', 'a_attr'=> json_encode(array('id'=> 'database-'.$value)), 'children'=>json_encode($children)));
-//    echo str_replace('\\', '', $result);
 
 
-    $temp = json_encode(array('text'=> $value, 'icon'=>'./res/database.ico', 'a_attr'=> json_encode(array('id'=> 'database-'.$value)), 'children'=>$temp), JSON_UNESCAPED_SLASHES);
-    $temp = str_replace($search,$replace, $temp);
+    $temp = array('text'=> $value, 'icon'=>'./res/database.ico', 'a_attr'=> array('id'=> 'database-'.$value), 'children'=>$children);
     array_push($output,$temp);
 }
 
-echo str_replace($search,$replace, json_encode($output));
+echo json_encode($output);

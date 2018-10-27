@@ -256,7 +256,7 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
                     success: function (data) {
                         if(data.success) {
                             alert(data.msg);
-                            location.reload();
+                            loadDatabases();
                         }
                         else
                             alert(data.msg);
@@ -291,28 +291,29 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
                 }
             ]
         });
-
-        $.ajax({
-            url: '<?php echo $domain.$path;?>lib/api/GetDatabases.php',
-            dataType: 'json',
-            success: function (data) {
-                data = data['data'];
-                hot.loadData(data);
-                hot.updateSettings({
-                    cells: function (row, col) {
-                        const no_editable = ['information_schema', 'mysql', 'performance_schema', 'sys'];
-                        let cellProperties = {};
-                        if(no_editable.indexOf(hot.getData()[row][col + 1]) !== -1)
-                        {
-                            cellProperties.readOnly = true;
-                            hot.getCell(row,col).style.backgroundColor = "#EEE";
+        function loadDatabases(){
+            $.ajax({
+                url: '<?php echo $domain.$path;?>lib/api/GetDatabases.php',
+                dataType: 'json',
+                success: function (data) {
+                    data = data['data'];
+                    hot.loadData(data);
+                    hot.updateSettings({
+                        cells: function (row, col) {
+                            const no_editable = ['information_schema', 'mysql', 'performance_schema', 'sys'];
+                            let cellProperties = {};
+                            if(no_editable.indexOf(hot.getData()[row][col + 1]) !== -1)
+                            {
+                                cellProperties.readOnly = true;
+                                hot.getCell(row,col).style.backgroundColor = "#EEE";
+                            }
+                            return cellProperties;
                         }
-                        return cellProperties;
-                    }
-                });
-            }
-        });
-
+                    });
+                }
+            });
+        }
+        loadDatabases();
         $('#submit-change').click(function () {
             let del = [];
             for(let i = 0; i < hot.countRows(); i ++) {
@@ -329,18 +330,17 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
                         success: function (data) {
                             let msg = '';
                             data.forEach(function (element) {
-                                element = JSON.parse(element);
                                 msg += element.msg + '\n';
                             });
                             alert(msg);
-                            location.reload();
+                            loadDatabases();
                         }
                     });
                 }
             }
         });
         $('#refresh').click(function () {
-            location.reload();
+            loadDatabases();
         });
     });
 </script>

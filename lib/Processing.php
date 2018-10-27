@@ -13,7 +13,16 @@ if(isset($_GET['type']) and !empty($_GET['type']) ) {
             echo DeleteDatabase($_GET['databaseNamesList']);
             break;
         case '3':
-            echo gettype($_GET['data']).' '.$_GET['data'].' '.(explode(',',$_GET['data'])[0] == '');
+            echo CreateTable($_GET['db'],$_GET['tb'],$_GET['data']);
+            break;
+        case '4':
+            echo DeleteTable($_GET['db'],$_GET['tb']);
+            break;
+        case '5':
+            echo GetDatabaseDetail($_GET['db']);
+            break;
+        case '6':
+            echo GetTablesList($_GET['db']);
             break;
     }
 }

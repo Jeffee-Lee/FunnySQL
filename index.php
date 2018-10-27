@@ -167,15 +167,27 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
         <div class="info-body">
             <ul>
                 <li>服务器：&nbsp;&nbsp;<?php echo mysqli_get_host_info($con);?></li>
-
                 <li>服务器版本：&nbsp;&nbsp;<?php echo mysqli_get_server_info($con)?></li>
-                <li>服务器字符集：&nbsp;&nbsp;<?php echo strtoupper($con->get_charset()->{'charset'});?></li>
                 <li>协议版本：&nbsp;&nbsp;<?php echo $con->protocol_version;?></li>
                 <li>当前用户：&nbsp;&nbsp;<?php
                     if($result = $con->query('SELECT USER()')) {
                         echo mysqli_fetch_array($result)['USER()'];
                     }
+                    $result->free_result();
                     ?></li>
+                <br/>
+                <?php
+                $result = $con->query(' SHOW VARIABLES LIKE  \'char%\';');
+                $tempName = array('客户端默认字符集：','连接默认字符集：','数据库默认字符集：','文件系统默认字符集：','结果集默认字符集：','服务器默认编码：','系统默认字符集：');
+                $tempIndex = 0;
+                while($row = $result->fetch_assoc()) {
+                    if($tempIndex == 7)
+                        break;
+                    echo '<li>'.$tempName[$tempIndex].'&nbsp;&nbsp;'.strtoupper($row['Value']).'</li>';
+                    $tempIndex ++;
+                }
+                $result->free_result();
+                ?>
             </ul></div>
     </div>
     <div class="database-tree"><div class="database-tree-head">数据库树状图</div>
