@@ -122,7 +122,6 @@ function CreateTable($databaseName, $tableName, $data)
 function GetDatabaseDetail($databaseName) {
     $con_info = explode(',', $_COOKIE['funnysql']);
     $con = new mysqli($con_info[0], $con_info[2], $con_info[3], '', $con_info[1]);
-
     $success = false;
     $msg = null;
     $data = array();
@@ -142,7 +141,6 @@ function GetDatabaseDetail($databaseName) {
                 $tableName = $row['TABLE_NAME'];
                 array_push($temp, $tableName);
             }
-            $count = count($temp);
             $result->free_result();
             if(count($temp) == 0) {
                 $success = true;
@@ -161,7 +159,7 @@ function GetDatabaseDetail($databaseName) {
         }
     }
     $con->close();
-    return $success?json_encode(array('success'=>$success,'colHeaders'=>$colHeaders,'columns'=>$columns,'data'=>$data,'temp'=>$sql,'count'=>$count)):json_encode(array('success'=>$success,'msg'=>$msg));
+    return $success?json_encode(array('success'=>$success,'colHeaders'=>$colHeaders,'columns'=>$columns,'data'=>$data)):json_encode(array('success'=>$success,'msg'=>$msg));
 }
 
 function DeleteTable($databaseName, $tableName) {
@@ -205,6 +203,98 @@ function GetTablesList($databaseName) {
         $result->free_result();
     }
 
+    $con->close();
+    return json_encode(array('success'=>$success,'msg'=>$msg));
+}
+
+function LoadTableData($databaseName, $tableName, $page = 1,$limit = 20) {
+    $con_info = explode(',', $_COOKIE['funnysql']);
+    $con = new mysqli($con_info[0], $con_info[2], $con_info[3], '', $con_info[1]);
+
+    $success = false;
+    $msg = null;
+    $data = array();
+
+    $colHeaders = array('','');
+    $columnsName = array();
+    $columns = array(array('type'=>'text','className'=>'htCenter htMiddle','width'=>70, 'renderer'=>'html'),array('type'=>'text','className'=>'htCenter htMiddle','width'=>70, 'renderer'=>'html'));
+    $key = array();
+    $totalPage = 0;
+
+    if($con->connect_errno)
+        $msg = $con->connect_error;
+    else {
+        $sql = "SHOW COLUMNS FROM $databaseName.$tableName";
+        $result = $con->query($sql);
+        if($con->errno)
+            $msg = $con->error;
+        else {
+            $success = true;
+            while($row = $result->fetch_assoc()) {
+                $columnTemp = array('type'=>'text','className'=>'htCenter htMiddle', 'renderer'=>'html');
+                $colHeaderTemp = $row['Field'];
+                array_push($colHeaders,$colHeaderTemp);
+                array_push($columns,$columnTemp);
+                array_push($columnsName, $colHeaderTemp);
+            }
+            $sql = "SELECT * FROM $databaseName.$tableName LIMIT ".($page - 1)*$limit.','.$limit;
+            $result = $con->query($sql);
+            if($con->errno) {
+                $success = false;
+                $msg = $con->error;
+            } else {
+                $success = true;
+                if($result->num_rows == 0) {
+                    $list = array('<del>null</del>','<del>null</del>');
+                    foreach ($columnsName as $item) {
+                        array_push($list, '<del>null</del>');
+                    }
+                    array_push($data,$list);
+                }
+                else {
+                    $count = 0;
+                    while($row = $result->fetch_assoc()) {
+
+                        $list = array('<a>编辑</a>',"<a href='javascript:void(0)' class='deleteData'column='$count'>删除</a>");
+                        foreach ($columnsName as $item) {
+                            $value = ($row[$item] == null)?'<del>null</del>':$row[$item];
+                            array_push($list, $value);
+                        }
+                        array_push($data,$list);
+                        $count ++;
+                    }
+                    $result = $con->query("SELECT COUNT(*) FROM $databaseName.$tableName");
+                    if($row = $result->fetch_assoc())
+                        $totalPage = ceil(intval($row['COUNT(*)'])/$limit);
+                }
+
+            }
+            $result->free_result();
+        }
+    }
+    $con->close();
+    if($totalPage == 0)
+        $page = 0;
+    return $success?json_encode(array('success'=>$success,'colHeaders'=>$colHeaders,'columns'=>$columns,'data'=>$data,'totalPage'=>$totalPage,'currentPage'=>$page)):json_encode(array('success'=>$success,'msg'=>$msg));
+}
+
+function DeleteTableData($databaseName, $tableName, $condition) {
+    $con_info = explode(',', $_COOKIE['funnysql']);
+    $con = new mysqli($con_info[0], $con_info[2], $con_info[3], '', $con_info[1]);
+    $success = false;
+    $msg = null;
+    if($con->connect_errno)
+        $msg = $con->connect_error;
+    else {
+        $sql = "DELETE FROM $databaseName.$tableName WHERE $condition";
+        $con->query($sql);
+        if($con->errno)
+            $msg = $con->error;
+        else {
+            $success = true;
+            $msg = '删除成功！';
+        }
+    }
     $con->close();
     return json_encode(array('success'=>$success,'msg'=>$msg));
 }

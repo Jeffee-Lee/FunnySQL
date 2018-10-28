@@ -24,5 +24,11 @@ if(isset($_GET['type']) and !empty($_GET['type']) ) {
         case '6':
             echo GetTablesList($_GET['db']);
             break;
+        case '7':
+            echo LoadTableData($_GET['db'],$_GET['tb'],$_GET['p']);
+            break;
+        case '8':
+            echo DeleteTableData($_GET['db'],$_GET['tb'],$_GET['condition']);
+            break;
     }
-}
+};

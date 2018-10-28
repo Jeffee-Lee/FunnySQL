@@ -47,7 +47,7 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
         position: fixed;
         top: 0;
         left: 0;
-        z-index: 99;
+        z-index: 1999;
         border-top: 10px solid #E7EAED;
         border-left: 8px solid #E7EAED;
         background: #E7EAED;
@@ -136,10 +136,12 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
 
     }
     .left-top, .left-bottom {
-        margin-bottom: 50px;
         display: block;
         border: 1px solid #e7eaed;
         border-radius: 10px;
+    }
+    .left-top {
+        margin-bottom: 60px;
     }
     .left-top-head,.left-bottom-head {
         background: #bbbbbb;
@@ -165,10 +167,10 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
     /*Right Part*/
     .right {
         float: right;
-        width: 58%;
+        width: 59%;
         display: block;
         border: 1px solid #e7eaed;
-        margin: 30px 20px;
+        margin: 30px 20px 0 20px;
         border-radius: 10px;
     }
     .right-head {
@@ -190,14 +192,15 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
             <button>取消</button></div></div>
     <div class="head">
         <a href="<?php echo $domain.$path?>" class='tab-0'>
-            <img src="<?php echo $domain.$path?>res/mysql.png"  class="icon mysql" width="16px" height="16px">&nbsp;概述</a>
+            <img src="data:image/png;base64,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
+"  class="icon mysql" width="16px" height="16px">&nbsp;概述</a>
         <a href="mysql_database.php" class="tab-1">
-            <img src="<?php echo $domain.$path?>res/database.png"  class="icon database" width="16px" height="16px">&nbsp;数据库</a>
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC8AAAAyCAYAAADMb4LpAAAACXBIWXMAAA7EAAAOxAGVKw4bAAADTklEQVRoge2a3W9TZRyAn57T9vQDurZrofsIxLGBEmGCI+yDDOOVGhMS0AVCwiUmCw5C/DMMwUmWyKWJiqJLuDFe+bGwDzKJlhkVN2YkGyv0c4WuPac7PVyM1jG2tU2gZ03Oc/u+78mT9+L9PRfHpGmaRomoOZX/Ht3lduIfJhNTzKRmCacjhBbuE05HWFhcYF6ZR0NjYTGNrMpIooTDbMeEiRprDQ6zA7/dR8CxFb/dR6OzgRZ3M7vcO9m+aRuiIJaqg2k9+WgmxkhojOtzI4zdv0EwOoGsyiV/vFwkUaK1dg/tWw9yqK6TzkA7tTbvmvufkU9lUwxOX+OLyStcnxtB1dQXJlsM0SRyqK6Tky3HOdp0BKfF+dR6QV5RFQb++IyPf79IVI7pIrsetZKXj147R++rH2AVrcAT+XA6wrEfjjMevqmzYnEO+F/nu7eu4Lf7EAB6h/qqQhxgPHyT3qE+gCX5H2d/0VWoXPK+AsCbDYd1lSmXvK8AMNDdT5t/v65CpdLm389Adz+w4rX5dGKAC8F+YnJcV8HV8Eoezrf28eGe3qdfm22ft3DtnW/Z52sllU1x9c4gX05+zUhoTPd3vjPQzomWHnp2HMNpcfJbJMiR79/j7qnJJXn7ZQ+SKHFu7xnO7j2DR3IDSxN2ODTK8NxoxSdsV10HXYGOwoSNywk+uXWJi7cuIasy6dPx/+XzuCwu3m8+yonmHjoCBxFMQmGtlLZJKAkAHmVTZHNZLIKFTU8mo9vqLqttclqO0dANvpr6hqtTgySzycLaqvLL2WL380b9YbrruziwpY3dnpcxC+bnd9UrWMwt8mf8b8Yf/MrQvWF+mv2ZcCay6t6i8iuxClZe8exih6uJppqXaHQ20uCsx2fz4rV52WzdjE20IZoEXFZX4VxSSaJqOTJqhofKQ2KZGJFMjNnUPWZSM0zP/8ud5DR/xW+j5JSSXNKn45R1jUpOIRidIBidKOfYC0MovmXjUv3yDrNDb4+yyPsabVNJjLapBEbb5DHaZh2MtlkLo22eI4a8XhhhVmmMMKskRpgZYWaEmRFm+lH9eVCtVL/8u9vf1tujLPK+RttUgjXbZvmmjd42yyn6y8pGaZvVWFd+JZVum2I8Bnrad8eZorexAAAAAElFTkSuQmCC"  class="icon database" width="16px" height="16px">&nbsp;数据库</a>
         <a href="mysql_table.php" class="tab-2 active">
-            <img src="<?php echo $domain.$path?>res/table.png"  class="icon table" width="16px" height="16px">&nbsp;数据表
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAZCAYAAAAv3j5gAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABwklEQVRIie2VvW4TURCFv7syokiVFEFIqSJR8QJuaPIEESIIGhpexU2aVLQ0FMhSmjyC2ygl0BCJivBXhCJYiuRoDsX98dxlvbECTsVYa+/ec+6cnbkz43A5u9LHb1OuTKzCBk1ga/0ug8evjjmfzlYikm1j7Q7NqkUAzqczmpWrJPsvdHMbjibqsydvz3rxZTjD0UQNgCQElC/J/bo1tXot8wChfFuguU8YeMQD7U3dDzW/LeYfi5AkCIBCrZIxZyHUTjo5BOQYg4pUhbTY2kF1clp+wnA00db2g+t3/oV9/nQaIxrvbSb9ACG/SQDB88PvjJ9u/pGqxADg2eEPxnv3XBR1+h/tn8Y+igSBjHwb82NAXlYtpojmNFoBlT6FBpQzcq/ZcQByTtpicvuqFqHOQF0MC+w6fBnOrQndbtW92V1fSHpx9LMXX4azc5BSZ2aEXKyxqmOVpyWZm2dlLARCUJokYKY0WERcDlU1xBEklckTRRSJRcCAEDGz5MTw/VI4eciY8FoxIj+ZSyXPX8fMT+k55gtANu+e0kMuogbg3dlF/KvouLLDvquP8/7Lr3giL1+f6MPXaccR/jt7eH+N3049rpNFFdKRAAAAAElFTkSuQmCC"  class="icon table" width="16px" height="16px">&nbsp;数据表
         </a>
-        <a href="#" class="tab-3">
-            <img src="" class="icon">&nbsp;数据库</a>
+        <a href="temp.php" class="tab-3">
+            <img src="" class="icon">&nbsp;临时</a>
         <a href="#" class="tab-4">
             <img src="" class="icon ic_s_db">&nbsp;数据库</a>
         <a href="#" class="tab-5">
@@ -272,41 +275,46 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
 
         $(document).ready(function(){
 
-            // Public
+            /* Common */
+            //顶部标签点击
             $(".head > a").click(function () {
                 if($(this).nextAll().length !== 0) {
                     //不是最右边的关闭
                     $('a.active').removeClass('active');
                     $(this).toggleClass('active');
-                } else {
+                } else
                     $('.msg').toggle();
-                    $('.msg-body button:first-child').click(function () {
-                        $.cookie('funnysql', '', {expires: -10, path: "<?php echo $path;?>"});
-                        window.location.replace('<?php echo $domain.$path;?>test');
-                    });
-                }
             });
-            $('.msg-head a').click(function () {
+            // 弹出窗右上角关闭按钮或弹出窗取消按钮点击
+            $('.msg-head a ,.msg-body button:last-child').click(function () {
                 $('.msg').hide();
             });
-            $('.msg-body button:last-child').click(function () {
-                $('.msg').hide();
+            // 弹出窗确定按钮点击
+            $('.msg-body button:first-child').click(function () {
+                $.cookie('funnysql', '', {expires: -10, path: "<?php echo $path;?>"});
+                window.location.replace('<?php echo $domain.$path;?>test');
             });
 
             // Left Part
             let originalDb = '<?php echo $dba;?>';
-            let container = document.getElementById('create');
-            $('.select-database').blur(function () {
+
+            $('.select-database').change(function () {
                 let db = $(this).val();
-                if(db !== originalDb)
-                    location.href = '<?php echo $domain.$path;?>mysql_table?db='+db;
+                if(db !== originalDb){
+                    console.log('dbdb '+db);
+                    reloadSelectTable(db);
+                    loadDetailTable(db);
+                    originalDb = db;
+                    window.history.pushState({},0,'<?php echo $domain.$path?>mysql_table?db='+db);
+                }
             });
+            let container = document.getElementById('create');
             let hot = new Handsontable(container, {
                 fillHandle: false,
                 stretchH: 'all',
-                colHeaders: ['名', '类型', '长度', '不是 null', '主键'],
-                minRows: 15,
-                height: 395,
+                colHeaders: ['名', '类型', '长度', 'No Null', '主键'],
+                minRows: 20,
+                height: 500,
                 columns: [
                     {
                         type: 'text',
@@ -339,11 +347,15 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
                     }
                 ]
             });
+            // 添加一行
             $('#addRow').click(function () {
                 hot.alter('insert_row', hot.countRows());
             });
             $('#removeRow').click(function () {
-                hot.alter('remove_row', hot.countRows() - 1);
+                if(hot.countRows() === 20)
+                    alert('😁不能再删除了！');
+                else
+                    hot.alter('remove_row', hot.countRows() - 1);
             });
             $('#push').click(function () {
                 let db = $('#left-top-select-database').val();
@@ -396,8 +408,8 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
                                 success: function (data) {
                                     if(data.success) {
                                         alert(data.msg);
-                                        loadDetailTable();
-                                        reloadSelectTable();
+                                        loadDetailTable(db);
+                                        reloadSelectTable(db);
                                     }
                                     else
                                         alert(data.msg);
@@ -429,14 +441,15 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
                     });
                 }
             });
-            function reloadSelectTable() {
+            function reloadSelectTable(db) {
+                if(db === undefined)
+                    db = '<?php echo $dba;?>'
                 $.ajax({
-                    url: '<?php echo $domain.$path.'lib/Processing.php?type=6&db='.$dba;?>',
+                    url: '<?php echo $domain.$path.'lib/Processing.php?type=6&db=';?>'+db,
                     dataType: 'json',
                     success: function (data) {
                         if(data.success) {
                             $('#left-bottom-select-table').html(data.msg);
-                            loadDetailTable();
                         }
                         else
                             alert(data.msg);
@@ -451,14 +464,19 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
                 stretchH: 'all',
                 readOnly: true,
                 colHeaders: true,
-                minRows: 20,
+                minRows: 25,
                 rowHeights: 30,
-                height: 630,
-                autoWrapRow: true,
+                height: 780,
+                columnSorting: true,
+                disableVisualSelection: true,
+                manualColumnResize: true,
             });
-            function loadDetailTable(){
+            loadDetailTable(originalDb);
+            function loadDetailTable(db){
+                if(db === undefined)
+                    db = '<?php echo $dba;?>';
                 $.ajax({
-                    url: '<?php echo $domain.$path."lib/Processing.php?type=5&db=".$dba;?>',
+                    url: '<?php echo $domain.$path."lib/Processing.php?type=5&db=";?>'+db,
                     dataType: 'json',
                     success: function (data) {
                         if(data.success) {
@@ -474,12 +492,13 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
                                 console.log('click');
                                 if(confirm('确定删除数据表'+ tb)) {
                                     $.ajax({
-                                        url: '<?php echo $domain . $path . "lib/Processing.php?type=4&db=" . $dba.'&tb=';?>'+tb,
+                                        url: '<?php echo $domain . $path . "lib/Processing.php?type=4&db=";?>'+db+'&tb='+tb,
                                         dataType: 'json',
                                         success: function (data) {
                                             if(data.success) {
                                                 alert(data.msg);
-                                                loadDetailTable();
+                                                reloadSelectTable(db);
+                                                loadDetailTable(db);
                                             }
                                             else
                                                 alert(data.msg);
@@ -487,13 +506,14 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
                                     });
                                 }
                             });
+                            $('.right-head').html(db);
                         } else {
                             alert(data.msg);
                         }
                     },
                 });
             }
-            loadDetailTable();
+
         });
     </script>
 </body>
