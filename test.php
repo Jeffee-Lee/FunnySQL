@@ -13,7 +13,7 @@ function getPost($name, &$status) {
 $host = getPost('host', $success);
 $port = getPost('port', $success);
 $userName = getPost('userName', $success);
-$password = getPost('password', $success);
+$password = $_POST['password'];
 
 $msg  = '';
 

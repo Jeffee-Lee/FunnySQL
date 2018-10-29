@@ -153,7 +153,7 @@ function GetDatabaseDetail($databaseName) {
                 else {
                     $success = true;
                     if ($row = $result->fetch_assoc())
-                        array_push($data, array('<a href="javascript:void(0)" style="color:red" class="delete-table" tb="'.$value.'">删除</a>','<a href="https://www.baidu.com" title="'.$value.'">'.$value.'</a>', $row['COUNT(*)']));
+                        array_push($data, array('<a href="javascript:void(0)" class="delete-table" tb="'.$value.'">删除</a>','<a href="https://www.baidu.com" title="'.$value.'">'.$value.'</a>', $row['COUNT(*)']));
                 }
             }
         }
@@ -207,7 +207,7 @@ function GetTablesList($databaseName) {
     return json_encode(array('success'=>$success,'msg'=>$msg));
 }
 
-function LoadTableData($databaseName, $tableName, $page = 1,$limit = 20) {
+function LoadTableData($databaseName, $tableName, $page = 1,$limit = 25) {
     $con_info = explode(',', $_COOKIE['funnysql']);
     $con = new mysqli($con_info[0], $con_info[2], $con_info[3], '', $con_info[1]);
 

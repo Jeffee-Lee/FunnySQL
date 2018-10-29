@@ -12,104 +12,14 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>FunnySQL</title>
-    <link rel="shortcut icon" href="<?php echo $domain.$path;?>res/favicon.png">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+    <title>概述 - FunnySQL</title>
+    <link rel="shortcut icon" href="<?php echo $path;?>res/favicon.png">
+    <link rel="stylesheet" href="<?php echo $path?>lib/jquery-ui/jquery-ui.min.css">
     <link href="https://cdn.bootcss.com/jstree/3.3.5/themes/default/style.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="<?php echo $path;?>lib/css.css">
 </head>
 <style>
-    * {
-        -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        box-sizing: border-box;
-    }
-    .head {
-        width: 100%;
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: 99;
-        border-top: 10px solid #E7EAED;
-        border-left: 8px solid #E7EAED;
-        background: #E7EAED;
-    }
-    .head a {
-        float: left;
-        text-decoration: none;
-        color: #235a81;
-        padding: .6em;
-        border-radius: 12px 12px 0 0;
-    }
-    .head > a > img {
-        margin-right: .5em;
-        vertical-align: -3px;
-    }
-    .head a:hover{
-        background: -webkit-gradient(linear, left top, left bottom, from(#ffffff), to(#e5e5e5));
-    }
-    .head .active {
-        background: white;
-        border-bottom-color: white;
-        color: black;
-    }
-    .head .active:hover {
-        background: white;
-    }
-    .head a:last-child {
-        float: right;
-        border: none;
-        -webkit-border-radius: unset;
-        -moz-border-radius: unset;
-        border-radius: unset;
-    }
-    .head a:last-child:hover {
-        background: red;
-        color: white;
-    }
-    .head a:last-child:active {
-        background: #ff6f6d;
-    }
-    .msg {
-        position: fixed;
-        top: 60px;
-        left: 45%;
-        width: 200px;
-        border: 1px solid #a4a4a4;
-        background: whitesmoke;
-        display: none;
-    }
-    .msg-head {
-        cursor: default;
-        padding: 6px 7px;
-        background: -webkit-linear-gradient(top, #ffffff, #dcdcdc);
-        font-size: 16px;
-    }
-    .msg-head a {
-        float: right;
-        margin: -7px;
-        padding: 7px;
-        color: #4b4b4b;
-    }
-    .msg-head a:hover {
-        background: red;
-        color: white;
-    }
-    .msg-head a:active {
-        background: #ff6f6d;
-    }
-    .msg-body {
-        margin: 10px 7px;
-        text-align: center;
-    }
-    .msg-body button:first-child {
-        margin-right: 30px;
-    }
 
-    .main {
-        margin-top: 60px;
-        width: 100%;
-        height: 300px;
-    }
     .info, .database-tree{
         display: block;
         border: 1px solid #e7eaed;
@@ -140,26 +50,20 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
     }
 </style>
 <body style="background: white;">
-<div class="msg"><div class="msg-head">确定离开？<a >X</a ></div><div class="msg-body">
+<div id="block"></div>
+<div id="msg"><div class="msg-head">确定离开？<a >X</a ></div><div class="msg-body">
         <button>确定</button>
         <button>取消</button></div></div>
 <div class="head">
-    <a href="<?php echo $domain.$path?>" class='tab-0 active'>
-        <img src="<?php echo $domain.$path?>res/mysql.png"  class="icon mysql" width="16px" height="16px">&nbsp;概述</a>
-    <a href="mysql_database.php" class="tab-1">
-        <img src="<?php echo $domain.$path?>res/database.png"  class="icon database" width="16px" height="16px">&nbsp;数据库</a>
-    <a href="#" class="tab-2">
-        <img src="http://10.242.8.182/phpMyAdmin/themes/pmahomme/img/s_db.png"  class="icon table">&nbsp;数据表
+    <a href="<?php echo $path?>" id="nav-home">
+        <img src="<?php echo $path?>res/mysql.png"  class="icon home" width="18px" height="18px">&nbsp;概述</a>
+    <a href="mysql_database.php" id="nav-database">
+        <img src="<?php echo $path?>res/database.png"  class="icon database" width="18px" height="18px">&nbsp;数据库</a>
+    <a href="new-delete-table" id="nav-table">
+        <img src="<?php echo $path?>res/table.png"  class="icon table" width="18px" height="18px">&nbsp;数据表
     </a>
-    <a href="#" class="tab-3">
-        <img src="http://10.242.8.182/phpMyAdmin/themes/pmahomme/img/s_db.png" class="icon">&nbsp;数据库</a>
-    <a href="#" class="tab-4">
-        <img src="http://10.242.8.182/phpMyAdmin/themes/pmahomme/img/s_db.png" class="icon ic_s_db">&nbsp;数据库</a>
-    <a href="#" class="tab-5">
-        <img src="http://10.242.8.182/phpMyAdmin/themes/pmahomme/img/s_db.png" class="icon ic_s_db">&nbsp;数据库</a>
-    <a href="#" class="tab-6">
-        <img src="http://10.242.8.182/phpMyAdmin/themes/pmahomme/img/s_db.png" class="icon ic_s_db">&nbsp;数据库</a>
-    <a href="#" class="exit">X</a>
+    <a href="javascript:void(0)" id="sql">&nbsp;SQL</a>
+    <a href="#" id="exit"> X </a>
 </div>
 <div class="main">
     <div class="info">
@@ -178,12 +82,12 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
                 <br/>
                 <?php
                 $result = $con->query(' SHOW VARIABLES LIKE  \'char%\';');
-                $tempName = array('客户端默认字符集：','连接默认字符集：','数据库默认字符集：','文件系统默认字符集：','结果集默认字符集：','服务器默认编码：','系统默认字符集：');
+                $tempName = array('客户端默认字符集：','连接默认字符集：','数据库默认字符集：','文件系统默认字符集：','结果集默认字符集：','服务器默认字符集：','系统默认字符集：');
                 $tempIndex = 0;
                 while($row = $result->fetch_assoc()) {
                     if($tempIndex == 7)
                         break;
-                    echo '<li>'.$tempName[$tempIndex].'&nbsp;&nbsp;'.strtoupper($row['Value']).'</li>';
+                    echo '<li>'.$tempName[$tempIndex].'&nbsp;&nbsp;'.$row['Value'].'</li>';
                     $tempIndex ++;
                 }
                 $result->free_result();
@@ -195,14 +99,43 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
 
     </div></div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
-<script src="https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+<script src="<?php echo $path?>lib/jquery.min.js"></script>
+<script src="<?php echo $path?>lib/jquery-ui/jquery-ui.js"></script>
+<script src="<?php echo $path?>lib/handsontable/handsontable.full.min.js"></script>
+<script src="<?php echo $path?>lib/jquery/jquery.cookie.min.js"></script>
 <script src="https://cdn.bootcss.com/jstree/3.3.5/jstree.min.js"></script>
-
 <script>
 
     $(document).ready(function(){
+        /* Other Start */
+        $('#nav-home').addClass('active');
+        /* Other End */
+
+        /* Common Part Start */
+        $(".head > a").click(function () {
+            if ($(this).nextAll().length !== 0) {
+                //不是最右边的关闭
+                $('a.active').removeClass('active');
+                $(this).toggleClass('active');
+            } else {
+                $('#msg').toggle();
+                $('#block').toggle();
+                $('.msg-body button:first-child').click(function () {
+                    $.cookie('funnysql', '', {expires: -10, path: "<?php echo $path;?>"});
+                    window.location.replace('<?php echo $domain . $path;?>index');
+                });
+            }
+        });
+        $('.msg-head a').click(function () {
+            $('#msg').hide();
+            $('#block').hide();
+        });
+        $('.msg-body button:last-child').click(function () {
+            $('#msg').hide();
+            $('#block').hide();
+        });
+        $('#msg').draggable();
+        /* Common Part End */
 
         // language=JQuery-CSS
         $(".head > a").click(function () {

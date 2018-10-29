@@ -1,0 +1,129 @@
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.head {
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 99;
+    font-size: 17px;
+    padding-left: 30px;
+    background: #d9d9d914;
+    border-bottom: 1px solid #d9d9d9;
+}
+.head a {
+    float: left;
+    text-decoration: none;
+    color: black;
+    padding: .5em .7em .5em .7em;
+    border-top: inset transparent;
+    border-bottom: inset transparent;
+}
+.head > a > img {
+    margin-right: .3em;
+    vertical-align: -3px;
+}
+#nav-home:hover,#nav-home.active {
+    border-bottom: inset #006a79;
+}
+#nav-database:hover,#nav-database.active{
+    border-bottom: inset red;
+}
+#nav-table:hover,#nav-table.active{
+    border-bottom: inset #005aff;
+}
+#sql:hover,#sql.active{
+    border-bottom: inset #00ffa187;
+}
+#exit {
+    float: right;
+    border: inset transparent;
+    vertical-align: middle;
+}
+#exit:hover {
+    background: red;
+    color: white;
+    border: inset transparent;
+}
+#exit:active {
+    background: #ff6f6d;
+}
+#block {
+    width: 100%;
+    height: 100%;
+    background: #00000047;
+    z-index: 99999;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: none;
+}
+#msg {
+    position: fixed;
+    top: 30%;
+    left: 43%;
+    z-index: 99999999;
+    width: 280px;
+    background: white;
+    border: 1px solid #0374ff8c;
+    box-shadow: 4px 7px #80808080;
+    display: none;
+}
+.msg-head {
+    cursor: default;
+    background: #d9d9d914;
+    padding: 10px;
+    font-size: 17px;
+    border-bottom: 1px solid #d9d9d9;
+}
+.msg-head a {
+    float: right;
+    margin: -10px;
+    padding: 7px;
+    color: black;
+    cursor: pointer;
+    border: inset transparent;
+}
+.msg-head a:hover {
+    background: red;
+    color: white;
+}
+.msg-head a:active {
+    background: #ff6f6d;
+}
+.msg-body {
+    margin: 10px 10px 0 10px;
+    text-align: center;
+}
+.msg-body button {
+    margin: 15px 5px 15px 15px;
+    padding: 7px 18px;
+    border: 1px solid #d9d9d9;
+    background: #cdcdcd1f;
+    outline: none;
+}
+.msg-body button:hover {
+    background: #d3f3ff;
+}
+.msg-body button:active {
+    background: #d3fffb;
+}
+.main {
+    margin-top: 50px;
+    width: 100%;
+}
+.left, .right {
+    margin: 30px 20px 0 20px;
+    border-radius: 10px;
+}
+.left {
+    float: left;
+    width: 34.33%;
+}
+.right {
+    float: right;
+    width: 59%;
+}
