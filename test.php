@@ -1,5 +1,6 @@
 <?php
 error_reporting(0);
+include "./lib/settings.php";
 $success = true;
 
 function getPost($name, &$status) {
@@ -27,5 +28,6 @@ if($success){
 }
 if($success) {
     $msg = $host.','.$port.','.$userName.','.$password;
+    setcookie('funnysql',$msg,time()+60*60*24,$path);
 }
 echo json_encode(array('success' => $success, 'msg' => $msg));

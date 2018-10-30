@@ -1,5 +1,5 @@
 <?php
-
+include "../settings.php";
 // 创建数据库
 function CreateDatabase($databaseName, $collationName) {
     $con_info = explode(',', $_COOKIE['funnysql']);
@@ -24,20 +24,19 @@ function CreateDatabase($databaseName, $collationName) {
     return json_encode(array('success'=>$success, 'msg'=>$msg));
 }
 
-// 删除数据库(一个或多个)
-function DeleteDatabase($databaseNamesList) {
+// 删除数据库
+function DeleteDatabase($databaseName) {
     $con_info = explode(',', $_COOKIE['funnysql']);
     $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
-    $output = array();
-
-    // 将删除的数据库列表字符串转换为数组
-    $databaseNamesList = explode(',', $databaseNamesList);
-    foreach ($databaseNamesList as $databaseName) {
-        $success = false;
-        $msg = '';
-        if($con->connect_errno) {
-            $msg = $con->connect_error;
-        } else if(!$con->select_db($databaseName)) {
+    $success = false;
+    $msg = '';
+    $system = array('information_schema', 'mysql', 'performance_schema', 'sys');
+    if(in_array($databaseName,$system))
+        $msg = '无法删除系统表！';
+    else if($con->errno)
+        $msg = $con->error;
+    else {
+        if(!$con->select_db($databaseName)) {
             $msg = '数据库'.$databaseName.'不存在！';
         } else {
             $sql = 'DROP DATABASE '.$databaseName;
@@ -50,10 +49,10 @@ function DeleteDatabase($databaseNamesList) {
                 $msg = '数据库'.$databaseName.'删除成功！';
             }
         }
-        array_push($output, array('success'=>$success, 'msg'=>$msg));
+
     }
     $con->close();
-    return json_encode($output);
+    return json_encode(array('success'=>$success, 'msg'=>$msg));
 }
 
 function CreateTable($databaseName, $tableName, $data)
@@ -125,6 +124,7 @@ function GetDatabaseDetail($databaseName) {
     $success = false;
     $msg = null;
     $data = array();
+    global $path;
 
     $colHeaders = array('','表名','记录数');
     $columns = array(array('type'=>'text','className'=>'htCenter htMiddle','width'=>20, 'renderer'=>'html'),array('type'=>'text','className'=>'htCenter htMiddle', 'width'=>100, 'renderer'=>'html'),array('type'=>'text','className'=>'htCenter htMiddle', 'width'=>25));
@@ -147,15 +147,15 @@ function GetDatabaseDetail($databaseName) {
                 array_push($temp,array('','',''));
             } else
                 foreach ($temp as $value) {
-                $result = $con->query('SELECT COUNT(*) FROM '.$databaseName.'.'.$value);
-                if($con->errno)
-                    $msg = $con->error;
-                else {
-                    $success = true;
-                    if ($row = $result->fetch_assoc())
-                        array_push($data, array('<a href="javascript:void(0)" class="delete-table" tb="'.$value.'">删除</a>','<a href="https://www.baidu.com" title="'.$value.'">'.$value.'</a>', $row['COUNT(*)']));
+                    $result = $con->query('SELECT COUNT(*) FROM '.$databaseName.'.'.$value);
+                    if($con->errno)
+                      $msg = $con->error;
+                    else {
+                        $success = true;
+                        if ($row = $result->fetch_assoc())
+                            array_push($data, array('<a href="javascript:void(0)" class="delete-table delete" tb="'.$value.'">删除</a>','<a href="'.$path.'view-edit-table?db='.$databaseName.'&tb='.$value.'" class="access " title="访问数据表 '.$value.'">'.$value.'</a>', $row['COUNT(*)']));
+                    }
                 }
-            }
         }
     }
     $con->close();
@@ -297,4 +297,28 @@ function DeleteTableData($databaseName, $tableName, $condition) {
     }
     $con->close();
     return json_encode(array('success'=>$success,'msg'=>$msg));
+}
+
+function GetDatabases() {
+    $con_info = explode(',', $_COOKIE['funnysql']);
+    $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
+    $success = false;
+    $msg = '';
+    $data = array();
+    global $path;
+    if($con->connect_errno)
+        $msg = $con->connect_error;
+    else {
+        $sql = 'SELECT SCHEMA_NAME, DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA;';
+        $result = $con->query($sql);
+        if($con->errno)
+            $msg = $con->error;
+        else {
+            $success = true;
+            while($row = $result->fetch_assoc()) {
+                array_push($data, array('<a href="javascript:void(0)" class="deleteDatabase delete" db="'.$row['SCHEMA_NAME'].'">删除</a>',"<a href='".$path."new-delete-table?db=".$row['SCHEMA_NAME']."' title='访问数据库 ".$row['SCHEMA_NAME']."' class='access'>".$row['SCHEMA_NAME']."</a>",$row['DEFAULT_COLLATION_NAME']));
+            }
+        }
+    }
+    return json_encode(array('success'=>$success,'msg'=>$msg,'data'=>$data));
 }

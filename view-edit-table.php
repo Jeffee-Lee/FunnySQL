@@ -46,8 +46,8 @@ $con->close();
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>FunnySQL</title>
-    <link rel="shortcut icon" href="<?php echo $domain.$path;?>res/favicon.png">
+    <title>数据表 - FunnySQL</title>
+    <link rel="shortcut icon" href="<?php echo $path;?>res/favicon.png">
     <link rel="stylesheet" href="<?php echo $path?>lib/jquery-ui/jquery-ui.min.css">
     <link rel="stylesheet" href="<?php echo $path?>lib/handsontable/handsontable.full.min.css">
     <link rel="stylesheet" href="<?php echo $path?>lib/css.css">
@@ -145,20 +145,22 @@ $con->close();
     }
 </style>
 <body>
-<div id="block"></div>
-<div id="msg"><div class="msg-head">确定离开？<a >X</a ></div><div class="msg-body">
+<div id="msg"><span id="msg-body"></span><span id="msg-close" style="cursor: pointer;">X</span></div>
+<div id="loader"></div>
+<div id="fullScreen"></div>
+<div id="close"><div class="close-head">确定离开？<a >X</a ></div><div class="close-body">
         <button>确定</button>
         <button>取消</button></div></div>
 <div class="head">
     <a href="<?php echo $path?>" id="nav-home">
         <img src="<?php echo $path?>res/mysql.png"  class="icon home" width="18px" height="18px">&nbsp;概述</a>
-    <a href="mysql_database.php" id="nav-database">
+    <a href="<?php echo $path?>database" id="nav-database">
         <img src="<?php echo $path?>res/database.png"  class="icon database" width="18px" height="18px">&nbsp;数据库</a>
-    <a href="new-delete-table" id="nav-table">
+    <a href="<?php echo $path?>new-delete-table" id="nav-table">
         <img src="<?php echo $path?>res/table.png"  class="icon table" width="18px" height="18px">&nbsp;数据表
     </a>
     <a href="javascript:void(0)" id="sql">&nbsp;SQL</a>
-    <a href="#" id="exit"> X </a>
+    <a href="#" id="exit">X</a>
 </div>
 <div class="main">
     <div class="left">
@@ -230,29 +232,39 @@ $con->close();
         /* Other End */
 
         /* Common Part Start */
-        $(".head > a").click(function () {
-            if ($(this).nextAll().length !== 0) {
-                //不是最右边的关闭
-                $('a.active').removeClass('active');
-                $(this).toggleClass('active');
-            } else {
-                $('#msg').toggle();
-                $('#block').toggle();
-                $('.msg-body button:first-child').click(function () {
-                    $.cookie('funnysql', '', {expires: -10, path: "<?php echo $path;?>"});
-                    window.location.replace('<?php echo $domain . $path;?>index');
-                });
+        function showLoader() {
+            $('#loader').show();
+        }
+        function hideLoader() {
+            $('#loader').hide();
+        }
+        function showMsg(Message, type) {
+            let color = 'red';
+            if(type === undefined || type === 'error')
+                color = "red";
+            else if (type === 'success')
+                color = "#00ff2b";
+            if(Message != null) {
+                $("#msg").css('background',color).addClass("msgShow").find('#msg-body').text(Message).parent('#msg').show();
+                setTimeout(function(){
+                    $("#msg").removeClass("msgShow").find('#msg-body').text('').parent('#msg').hide();
+                }, 3333)
             }
+        }
+        $("#msg-close").click(function () {
+            $("#msg").removeClass("msgShow").find('#msg-body').text('').parent('#msg').hide();
         });
-        $('.msg-head a').click(function () {
-            $('#msg').hide();
-            $('#block').hide();
+        $("#exit").click(function () {
+            $("#close, #fullScreen").show();
         });
-        $('.msg-body button:last-child').click(function () {
-            $('#msg').hide();
-            $('#block').hide();
+        $('.close-body button:first-child').click(function () {
+            $.cookie('funnysql', '', {expires: -10, path: "<?php echo $path;?>"});
+            window.location.href = '<?php echo $path;?>index';
         });
-        $('#msg').draggable();
+        $('.close-head a, .close-body button:last-child').click(function () {
+            $("#close, #fullScreen").hide();
+        });
+        $("#close").draggable();
         /* Common Part End */
 
         /* Left Part1 Start */
@@ -266,13 +278,12 @@ $con->close();
             setTimeout(function () {
                 let tb = $('#tableName').val();
                 loadDataTable(db,tb);
-                $('.right-head').html(tb);
             },500);
 
         });
 
         let totalPage = '1';
-        let currentPage = <?php echo $page;?>;
+        let currentPage = '<?php echo $page;?>';
         let originalDb = '<?php echo $dba;?>';
         let originalTb = '<?php echo $tb;?>';
         let colHeaders = null;
@@ -326,6 +337,9 @@ $con->close();
             $.ajax({
                 url: '<?php echo $domain.$path."lib/Processing.php?type=7&db=";?>'+db + '&tb=' + tb + '&p='+ page,
                 dataType: 'json',
+                beforeSend: function(){
+                    $('#loader').show();
+                },
                 success: function (data) {
                     if(data.success) {
                         colHeaders = data.colHeaders;
@@ -339,8 +353,12 @@ $con->close();
                         totalPage = data.totalPage;
                         originalDb = db;
                         originalTb = tb;
-                        window.history.pushState({},'','<?php echo $domain.$path.basename(__FILE__,'.php');?>?p='+currentPage+'&db='+db + '&tb='+tb);
+                        window.history.replaceState({},'','<?php echo $domain.$path.basename(__FILE__,'.php');?>?p='+currentPage+'&db='+db + '&tb='+tb);
                         $('#pageInfo').html(currentPage + '/' + totalPage);
+                        $('.right-head').html(tb + "<img id=\"refresh\" src=\"<?php echo $path?>res/refresh.png\" title=\"刷新\"/>");
+                        $('#refresh').click(function () {
+                            loadDataTable(originalDb,originalTb, 1);
+                        });
                         $('.deleteData').click(function () {
                             let row = dataTable.getDataAtRow($(this).attr('column'));
                             let i = 2;
@@ -366,6 +384,7 @@ $con->close();
                     }
                     else
                         alert(data.msg);
+                    $('#loader').hide();
                 }
             });
         }
@@ -378,7 +397,6 @@ $con->close();
             $('#pageInfo').show();
         });
         $('#inputPage').keydown(function (even) {
-            console.log(even.keyCode);
             if(even.keyCode === 13) {
                 let inputPage = $(this).val();
                 if(inputPage > totalPage || inputPage <= 0)
@@ -396,8 +414,20 @@ $con->close();
            else
                loadDataTable(originalDb,originalTb, parseInt(currentPage) - 1);
         });
+        $(document).keydown(function (even) {
+            if(even.keyCode === 37 || even.keyCode === 38) {
+                if(parseInt(currentPage) === 1)
+                    alert('已经是第一页了！');
+                else
+                    loadDataTable(originalDb,originalTb, parseInt(currentPage) - 1);
+            } else if(even.keyCode === 39 || even.keyCode === 40) {
+                if(parseInt(currentPage) >= parseInt(totalPage))
+                    alert('已经是最后一页了！');
+                else
+                    loadDataTable(originalDb,originalTb, parseInt(currentPage) + 1);
+            }
+        });
         $('#pageNext').click(function () {
-            console.log(totalPage);
             if(parseInt(currentPage) >= parseInt(totalPage))
                 alert('已经是最后一页了！');
             else

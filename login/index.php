@@ -10,10 +10,107 @@
 </head>
 <?php  unset($_COOKIE['funnysql']); setcookie('funnysql',null,-1,$path)?>
 <style>
-    *{box-sizing:border-box}body{background:url("<?php echo $domain.$path;?>res/bgImage.jpg") no-repeat fixed center ;background-size:cover;width:100%}.main{position:absolute;margin:auto;top:0;left:0;bottom:0;right:0;height:500px;text-align:center}a{text-decoration:none;color:black}header{width:100%;text-align:center;font-size:40px;font-family:'Abril Fatface',cursive;margin-bottom:110px}form{max-width:360px;margin:0 auto}.input{width:100%;text-align:center}input{height:40px;width:100%;border:0;font-size:12px;background:rgba(255,255,255,.7);padding:8px 12px;margin-bottom:10px}input[type='submit']{background:#f5bc22}input[type='submit']:active{background:red}input[type='focus']:focus{background:blue}.error{width:360px;text-align:center;color:white;background:red;font-size:12px;z-index:1;position:absolute;padding:13px 0;top:0;left:50%;margin-left:-180px;display:none}.errorShow{animation-name:fadeInUp;animation-duration:1s;display:block}@keyframes fadeInUp{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
+    *{
+        box-sizing:border-box
+    }
+    body{
+        background:url("<?php echo $domain.$path;
+    ?>res/bgImage.jpg") no-repeat fixed center ;
+        background-size:cover;
+        width:100%
+    }
+    .main{
+        position:absolute;
+        margin:auto;
+        top:0;
+        left:0;
+        bottom:0;
+        right:0;
+        height:500px;
+        text-align:center
+    }
+    a{
+        text-decoration:none;
+        color:black
+    }
+    header{
+        width:100%;
+        text-align:center;
+        font-size:40px;
+        font-family:'Abril Fatface',cursive;
+        margin-bottom:110px
+    }
+    form{
+        max-width:360px;
+        margin:0 auto
+    }
+    .input{
+        width:100%;
+        text-align:center
+    }
+    input{
+        height:40px;
+        width:100%;
+        border:0;
+        font-size:12px;
+        background:rgba(255,255,255,.7);
+        padding:8px 12px;
+        margin-bottom:10px
+    }
+    input[type='submit']{
+        background:#f5bc22
+    }
+    input[type='submit']:active{
+        background:red
+    }
+    input[type='focus']:focus{
+        background:blue
+    }
+    #error{
+        text-align:center;
+        color:white;
+        background:red;
+        font-size:12px;
+        z-index:1;
+        position: fixed;
+        padding:13px 13px;
+        top:0;
+        left: 0;
+        right: 0;
+        display:none;
+        margin: 0 auto;
+        width: 500px;
+    }
+    #error-close {
+        float: right;
+        color: #eaeaea;
+        cursor: pointer;
+    }
+    #error-close:hover {
+        color: #dedede;
+    }
+    #error-close:active {
+        color: #ffffff;
+    }
+
+    .errorShow{
+        animation-name:fadeInUp;
+        animation-duration:1s;
+    }
+    @keyframes fadeInUp{
+        0%{
+            opacity:0;
+            transform:translateY(20px)
+        }
+        100%{
+            opacity:1;
+            transform:translateY(0)
+        }
+    }
+
 </style>
 <body>
-    <div class="error" style="padding: 10px"></div>
+<div id="error"><span id="error-msg"></span><span id="error-close">X</span></div>
 	<div class="main">
 		<header class="header"><a href="<?php echo $domain.$path; ?>">FunnySQL</a></header>
 		<form onsubmit="return false">
@@ -24,21 +121,26 @@
 			<input type="submit" class="submit">
 		</form>
 	</div>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="<?php echo $path?>lib/jquery.min.js"></script>
 	<script>
 		$(document).ready(function(){
 			function showError(errorMessage) {
 				if(errorMessage != null) {
-                    $('.error').addClass("errorShow");
-                    $('.error').text(errorMessage);
-                    $('.error').show();
+                    $('#error').addClass("errorShow");
+                    $('#error-msg ').text(errorMessage);
+                    $('#error').show();
                     setTimeout(function(){
-                        $('.error').removeClass("errorShow");
-                        $('.error').text("");
-                        $(".error").hide();
+                        $('#error').removeClass("errorShow");
+                        $('#error-msg').text("");
+                        $("#error").hide();
                     }, 3000)
                 }
 			}
+			$('#error-close').click(function () {
+                $('#error').removeClass("errorShow");
+                $('#error-msg').text("");
+                $("#error").hide();
+            });
 			let errorMessage;
 			$(".submit").click(function(){
 				let host = $("input[name='host']").val();
@@ -73,22 +175,15 @@
                                 // errorMessage = "连接错误，请检查输入！";
                                 showError(errorMessage);
                                 errorMessage = null;
-                                console.log(errorMessage);
                             } else {
                                 let msg = data.msg;
-                                let date = new Date();
-                                date.setTime(date.getTime() + 24 * 60 * 60 * 1000);
-                                let setCookie = "funnysql=" + msg + ';expires=' + date.toString() + ';path=<?php echo $path;?>';
-                                document.cookie = setCookie;
-                                window.location.replace("<?php echo $domain.$path;?>");
+                                window.location.href = "<?php echo $path;?>";
                             }
 
 						},
 						error: function(){
 							errorMessage = '连接超时，请检查输入！';
                             showError(errorMessage);
-                            errorMessage = null;
-                            console.log(errorMessage);
 						}
 					});
 				showError(errorMessage);

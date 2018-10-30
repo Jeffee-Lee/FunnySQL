@@ -10,7 +10,7 @@ if(isset($_GET['type']) and !empty($_GET['type']) ) {
             echo CreateDatabase($_GET['databaseName'],$_GET['collationName']);
             break;
         case '2':
-            echo DeleteDatabase($_GET['databaseNamesList']);
+            echo DeleteDatabase($_GET['db']);
             break;
         case '3':
             echo CreateTable($_GET['db'],$_GET['tb'],$_GET['data']);
@@ -29,6 +29,9 @@ if(isset($_GET['type']) and !empty($_GET['type']) ) {
             break;
         case '8':
             echo DeleteTableData($_GET['db'],$_GET['tb'],$_GET['condition']);
+            break;
+        case '9':
+            echo GetDatabases();
             break;
     }
 };
