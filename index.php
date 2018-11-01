@@ -15,11 +15,10 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
     <title>概述 - FunnySQL</title>
     <link rel="shortcut icon" href="<?php echo $path;?>res/favicon.png">
     <link rel="stylesheet" href="<?php echo $path?>lib/jquery-ui/jquery-ui.min.css">
-    <link href="https://cdn.bootcss.com/jstree/3.3.5/themes/default/style.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.bootcss.com/jstree/3.3.5/themes/default/style.min.css">
     <link rel="stylesheet" href="<?php echo $path;?>lib/css.css">
 </head>
 <style>
-
 
     .left-body ul {
          margin: 0;
@@ -88,6 +87,7 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
 <script src="<?php echo $path?>lib/jquery-ui/jquery-ui.js"></script>
 <script src="<?php echo $path?>lib/jquery/jquery.cookie.min.js"></script>
 <script src="https://cdn.bootcss.com/jstree/3.3.5/jstree.min.js"></script>
+<script src="<?php echo $path?>lib/js.js"></script>
 <script>
 
     $(document).ready(function(){
@@ -95,7 +95,7 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
         $('#nav-home').addClass('active');
         /* Other End */
 
-        /* Common Part Start */
+        /* Common Part Start*/
         function showLoader() {
             $('#loader').show();
         }
@@ -116,19 +116,28 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
             }
         }
         $("#msg-close").click(function () {
-            $("#msg").removeClass("msgShow").find('#msg-body').text('').parent('#msg').hide();
+            $("#msg").removeClass("msgShow").hide().find('#msg-body').text('');
         });
         $("#exit").click(function () {
             $("#close, #fullScreen").show();
-        });
-        $('.close-body button:first-child').click(function () {
-            $.cookie('funnysql', '', {expires: -10, path: "<?php echo $path;?>"});
-            window.location.href = '<?php echo $path;?>index';
         });
         $('.close-head a, .close-body button:last-child').click(function () {
             $("#close, #fullScreen").hide();
         });
         $("#close").draggable();
+        $('.close-body button:first-child').click(function () {
+            $.ajax({
+                url: '<?php echo $path;?>lib/Processing.php',
+                method: 'post',
+                data: {'type': '2'},
+                success: function () {
+                    window.location.href = '<?php echo $path;?>';
+                }
+            });
+        });
+        $('#refresh').click(function () {
+            loadTree();
+        });
         /* Common Part End */
 
         $("#tree").jstree({
@@ -169,9 +178,7 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
             });
         }
         loadTree();
-        $('#refresh').click(function () {
-           loadTree();
-        });
+
     });
 </script>
 </body>

@@ -127,14 +127,20 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
             }
         }
         $("#msg-close").click(function () {
-            $("#msg").removeClass("msgShow").find('#msg-body').text('').parent('#msg').hide();
+            $("#msg").removeClass("msgShow").hide().find('#msg-body').text('');
         });
         $("#exit").click(function () {
             $("#close, #fullScreen").show();
         });
         $('.close-body button:first-child').click(function () {
-            $.cookie('funnysql', '', {expires: -10, path: "<?php echo $path;?>"});
-            window.location.href = '<?php echo $path;?>index';
+            $.ajax({
+                url: '<?php echo $path;?>lib/Processing.php',
+                method: 'post',
+                data: {'type': '2'},
+                success: function () {
+                    window.location.href = '<?php echo $path;?>';
+                }
+            });
         });
         $('.close-head a, .close-body button:last-child').click(function () {
             $("#close, #fullScreen").hide();

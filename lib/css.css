@@ -24,10 +24,10 @@ a {
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 99;
+    z-index: 999;
     font-size: 17px;
     padding-left: 30px;
-    background: #d9d9d914;
+    background: white;
     border-bottom: 1px solid #d9d9d9;
 }
 .head a {
@@ -71,7 +71,7 @@ a {
     width: 100%;
     height: 100%;
     background: #00000047;
-    z-index: 99999;
+    z-index: 9990;
     position: fixed;
     top: 0;
     left: 0;
@@ -114,19 +114,7 @@ a {
     margin: 10px 10px 0 10px;
     text-align: center;
 }
-.close-body button {
-    margin: 15px 5px 15px 15px;
-    padding: 7px 18px;
-    border: 1px solid #d9d9d9;
-    background: #cdcdcd1f;
-    outline: none;
-}
-.close-body button:hover {
-    background: #d3f3ff;
-}
-.close-body button:active {
-    background: #d3fffb;
-}
+
 .main {
     margin-top: 50px;
     width: 100%;
@@ -135,14 +123,26 @@ a {
     margin: 30px 20px 0 20px;
     border-radius: 10px;
 }
-.left {
-    float: left;
-    width: 34.33%;
+@media screen and (min-width: 1220px) {
+    .left {
+        float: left;
+        width: 34.33%;
+    }
+    .right {
+        float: right;
+        width: 59%;
+    }
 }
-.right {
-    float: right;
-    width: 59%;
+
+@media screen and (max-width: 1220px) {
+    .left, .right {
+        margin: 30px;
+    }
+    .left {
+        margin-top: 80px;
+    }
 }
+
 
 #loader {
     display: none;
@@ -173,7 +173,7 @@ a {
     text-align:center;
     color: #ffffff;
     font-size:14px;
-    z-index:999;
+    z-index:9999;
     position: fixed;
     padding: 10px;
     top:0;
@@ -210,12 +210,11 @@ a {
     }
 }
 
-
 #refresh {
     float: right;
     cursor: pointer;
-    width: 22px;
-    height: 22px;
+    width: 19px;
+    height: 19px;
 }
 
 #refresh:hover, #refresh:active{
@@ -223,7 +222,7 @@ a {
     animation: spin 2s linear infinite;
 }
 
-/* 表格中,可以跳转访问的链接 */
+/* 表格中，跳转访问的链接 */
 .access {
     color: black;
     text-decoration: #289bff underline;;
@@ -235,7 +234,7 @@ a {
     color: #d6d6d6;
 }
 
-/* 表格中,可以指向删除的链接 */
+/* 表格中，指向删除的链接 */
 .delete {
     color: red;
 
@@ -245,6 +244,12 @@ a {
 }
 .delete:active {
     color: #ff6957;
+}
+
+/* 表格中，指向编辑的链接 */
+.edit {
+    color: black;
+    text-decoration: black underline;
 }
 
 /* 表格中，默认文字颜色 */
@@ -262,7 +267,7 @@ a {
     border: 1px solid #d9d9d9;
 }
 .block-head{
-    background: #d9d9d914;
+    background: #fcfcfc;
     border-bottom: 1px solid #d9d9d9;
     color: black;
     padding: 9px;
@@ -286,6 +291,7 @@ a {
     font-size: 16px;
     cursor: pointer;
     display: inline-block;
+    z-index: 9999;
 }
 #more {
     background: #fff24694;
@@ -306,5 +312,45 @@ a {
     background: #00f8ff94;
 }
 #more-info {
+    display: none;
+}
+
+.input {
+    font-size: 16px;
+    width: 45%;
+    margin: 8px;;
+    height: 25px;
+}
+
+#popUpEdit {
+    position: fixed;
+    top: 40%;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: 55%;
+    z-index: 9995;
+    box-shadow: 4px 7px #80808080;
+}
+#editClose {
+    float: right;
+    margin: -10px;
+    padding: 7px;
+    color: black;
+    cursor: pointer;
+    border: inset transparent;
+}
+#editClose:hover {
+    background: red;
+    color: white;
+}
+ #editClose:active {
+    background: #ff6f6d;
+}
+.pika-single {
+    z-index: 99999;
+}
+
+#dataTable .htAutocompleteArrow {
     display: none;
 }

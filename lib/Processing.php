@@ -2,7 +2,7 @@
 require_once('settings.php');
 require_once('./api/functions.php');
 
-//获取GET请求类型
+// GET请求处理
 if(isset($_GET['type']) and !empty($_GET['type']) ) {
     switch ($_GET['type']) {
         // 1: 创建数据库
@@ -32,6 +32,21 @@ if(isset($_GET['type']) and !empty($_GET['type']) ) {
             break;
         case '9':
             echo GetDatabases();
+            break;
+    }
+};
+
+// POST 请求处理
+if(isset($_POST['type']) and !empty($_POST['type'])) {
+    switch ($_POST['type']) {
+        case '1':
+            echo SetConnect($_POST['host'],$_POST['port'],$_POST['userName'],$_POST['password']);
+            break;
+        case '2':
+            RemoveConnect();
+            break;
+        case '3':
+            echo InsertData($_POST['db'],$_POST['tb'], $_POST['data']);
             break;
     }
 };

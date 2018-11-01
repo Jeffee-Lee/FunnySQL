@@ -92,23 +92,6 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
                     </div>
                 </div>
             </div>
-            <div class="block" style="margin-top: 30px;">
-                <div class="block-head">删除数据表</div>
-                <div class="block-body">
-
-                    <select name="select-table" id="left-bottom-select-table" class="input" title="选择删除的数据表名">
-                        <?php
-                        $result = $con->query('SHOW TABLES FROM '.$dba);
-                        while($row = $result->fetch_assoc()) {
-                            $value = $row[sprintf('Tables_in_%s',$dba)];
-                            echo '<option value="' . $value . '">'.$value.'</option>';
-                        }
-                        $result->free_result();
-                        ?>
-                    </select>
-                    <button id="left-bottom-delete">&nbsp;&nbsp;删除&nbsp;&nbsp;</button>
-                </div>
-            </div>
 
         </div>
         
@@ -175,8 +158,14 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
                 $("#close, #fullScreen").show();
             });
             $('.close-body button:first-child').click(function () {
-                $.cookie('funnysql', '', {expires: -10, path: "<?php echo $path;?>"});
-                window.location.href = '<?php echo $path;?>index';
+                $.ajax({
+                    url: '<?php echo $path;?>lib/Processing.php',
+                    method: 'post',
+                    data: {'type': '2'},
+                    success: function () {
+                        window.location.href = '<?php echo $path;?>';
+                    }
+                });
             });
             $('.close-head a, .close-body button:last-child').click(function () {
                 $("#close, #fullScreen").hide();
@@ -189,7 +178,6 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
             // 选择数据库改变
             $('.select-database').change(function () {
                 let db = $(this).val();
-                reloadSelectTable(db);
                 loadDetailTable(db);
                 originalDb = db;
                 window.history.replaceState({},'','<?php echo $domain.$path.basename(__FILE__,'.php');?>?db='+db);
@@ -309,7 +297,6 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
                                     if(data.success) {
                                         showMsg(data.msg, 'success');
                                         loadDetailTable(db);
-                                        reloadSelectTable(db);
                                     }
                                     else
                                         showMsg(data.msg,'error');
@@ -320,50 +307,7 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
 
 
             });
-            // 左下块删除按钮点击
-            $("#left-bottom-delete").click(function () {
-                let tb = $("#left-bottom-select-table").val();
 
-                let msg = '确定删除数据库'+originalDb+'中的数据表'+tb;
-                if (confirm(msg)) {
-                    $.ajax({
-                        url: '<?php echo $domain . $path . "lib/Processing.php?type=4&db=";?>' + originalDb + '&tb=' +tb,
-                        dataType: 'json',
-                        timeout: 3000,
-                        beforeSend: function(){
-                            showLoader();
-                        },
-                        complete: function(){
-                            hideLoader();
-                        },
-                        success: function (data) {
-                            if(data.success) {
-                                showMsg(data.msg,'success');
-                                loadDetailTable(originalDb);
-                                reloadSelectTable(originalDb);
-                            }
-                            else
-                                showMsg(data.msg, 'error');
-                        }
-                    });
-                }
-            });
-            function reloadSelectTable(db) {
-                if(db === undefined)
-                    db = '<?php echo $dba;?>'
-                $.ajax({
-                    url: '<?php echo $domain.$path.'lib/Processing.php?type=6&db=';?>'+db,
-                    dataType: 'json',
-                    timeout: 3000,
-                    success: function (data) {
-                        if(data.success) {
-                            $("#left-bottom-select-table").html(data.msg);
-                        }
-                        else
-                            showMsg(data.msg, 'error');
-                    }
-                })
-            }
 
             // Right Part
             let detailTable = new Handsontable(document.getElementById('showDetail'), {
@@ -410,7 +354,6 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
                                         success: function (data) {
                                             if(data.success) {
                                                 showMsg(data.msg,'success');
-                                                reloadSelectTable(db);
                                                 loadDetailTable(db);
                                             }
                                             else
@@ -421,7 +364,6 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
                             });
                             $("#blockRight1").html(db+"<img id=\"refresh\" src=\"<?php echo $path?>res/refresh.png\" width=\"16px\" height=\"16px\" title=\"刷新\"/>");
                             $('#refresh').click(function () {
-                                reloadSelectTable(db);
                                 loadDetailTable(db);
                             })
                         } else {

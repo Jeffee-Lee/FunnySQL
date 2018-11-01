@@ -1,5 +1,6 @@
 <?php
 include "../settings.php";
+/* GET 请求处理函数 */
 // 创建数据库
 function CreateDatabase($databaseName, $collationName) {
     $con_info = explode(',', $_COOKIE['funnysql']);
@@ -54,7 +55,7 @@ function DeleteDatabase($databaseName) {
     $con->close();
     return json_encode(array('success'=>$success, 'msg'=>$msg));
 }
-
+// 创建数据表
 function CreateTable($databaseName, $tableName, $data)
 {
     $con_info = explode(',', $_COOKIE['funnysql']);
@@ -117,7 +118,7 @@ function CreateTable($databaseName, $tableName, $data)
     $con->close();
     return json_encode(Array('success'=>$success, 'msg'=>$msg));
 }
-
+// 获取数据库名及编码列表
 function GetDatabaseDetail($databaseName) {
     $con_info = explode(',', $_COOKIE['funnysql']);
     $con = new mysqli($con_info[0], $con_info[2], $con_info[3], '', $con_info[1]);
@@ -162,6 +163,7 @@ function GetDatabaseDetail($databaseName) {
     return $success?json_encode(array('success'=>$success,'colHeaders'=>$colHeaders,'columns'=>$columns,'data'=>$data)):json_encode(array('success'=>$success,'msg'=>$msg));
 }
 
+// 删除数据表
 function DeleteTable($databaseName, $tableName) {
     $con_info = explode(',', $_COOKIE['funnysql']);
     $con = new mysqli($con_info[0], $con_info[2], $con_info[3], '', $con_info[1]);
@@ -181,8 +183,7 @@ function DeleteTable($databaseName, $tableName) {
     $con->close();
     return json_encode(array('success'=>$success,'msg'=>$msg));
 }
-
-
+// 获取数据表列表，选择框下拉内嵌代码
 function GetTablesList($databaseName) {
     $con_info = explode(',', $_COOKIE['funnysql']);
     $con = new mysqli($con_info[0], $con_info[2], $con_info[3], '', $con_info[1]);
@@ -206,8 +207,8 @@ function GetTablesList($databaseName) {
     $con->close();
     return json_encode(array('success'=>$success,'msg'=>$msg));
 }
-
-function LoadTableData($databaseName, $tableName, $page = 1,$limit = 25) {
+// 获取数据表的数据
+function LoadTableData($databaseName, $tableName, $page = 1,$limit = 30) {
     $con_info = explode(',', $_COOKIE['funnysql']);
     $con = new mysqli($con_info[0], $con_info[2], $con_info[3], '', $con_info[1]);
 
@@ -224,18 +225,35 @@ function LoadTableData($databaseName, $tableName, $page = 1,$limit = 25) {
     if($con->connect_errno)
         $msg = $con->connect_error;
     else {
-        $sql = "SHOW COLUMNS FROM $databaseName.$tableName";
+        $sql = "SELECT COLUMN_NAME,DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='$databaseName' AND TABLE_NAME='$tableName'";
         $result = $con->query($sql);
         if($con->errno)
             $msg = $con->error;
         else {
             $success = true;
+            $isDate = array('date','time','year','datetime','timestamp');
             while($row = $result->fetch_assoc()) {
-                $columnTemp = array('type'=>'text','className'=>'htCenter htMiddle', 'renderer'=>'html');
-                $colHeaderTemp = $row['Field'];
+                $colHeaderTemp = $row['COLUMN_NAME'];
                 array_push($colHeaders,$colHeaderTemp);
-                array_push($columns,$columnTemp);
                 array_push($columnsName, $colHeaderTemp);
+                if(!in_array($row['DATA_TYPE'],$isDate))
+                    $columnTemp = array('type'=>'text','className'=>'htCenter');
+                else {
+                    switch ($row['DATA_TYPE']) {
+                        case 'date':
+                            $columnTemp = array('type'=>'date','className'=>'htCenter','dateFormat'=>'YYYY-MM-DD');
+                            break;
+                        case 'time':
+                            $columnTemp = array('type'=>'date','className'=>'htCenter','dateFormat'=>'HH:mm:ss');
+                            break;
+                        case 'year':
+                            $columnTemp = array('type'=>'date','className'=>'htCenter','dateFormat'=>'YYYY');
+                            break;
+                        default:
+                            $columnTemp = array('type'=>'date','className'=>'htCenter','dateFormat'=>'YYYY-MM-DD HH:mm:ss.SSSSSS');
+                    }
+                }
+                array_push($columns,$columnTemp);
             }
             $sql = "SELECT * FROM $databaseName.$tableName LIMIT ".($page - 1)*$limit.','.$limit;
             $result = $con->query($sql);
@@ -244,29 +262,22 @@ function LoadTableData($databaseName, $tableName, $page = 1,$limit = 25) {
                 $msg = $con->error;
             } else {
                 $success = true;
-                if($result->num_rows == 0) {
-                    $list = array('<del>null</del>','<del>null</del>');
+
+                 $count = 0;
+                while($row = $result->fetch_assoc()) {
+
+                    $list = array("<a href='javascript:void(0)' class='edit editData' row='$count'>编辑</a>","<a href='javascript:void(0)' class='deleteData delete'column='$count'>删除</a>");
                     foreach ($columnsName as $item) {
-                        array_push($list, '<del>null</del>');
+                        $value = $row[$item];
+                        array_push($list, $value);
                     }
                     array_push($data,$list);
+                    $count ++;
                 }
-                else {
-                    $count = 0;
-                    while($row = $result->fetch_assoc()) {
+                $result = $con->query("SELECT COUNT(*) FROM $databaseName.$tableName");
+                if($row = $result->fetch_assoc())
+                    $totalPage = ceil(intval($row['COUNT(*)'])/$limit);
 
-                        $list = array('<a>编辑</a>',"<a href='javascript:void(0)' class='deleteData'column='$count'>删除</a>");
-                        foreach ($columnsName as $item) {
-                            $value = ($row[$item] == null)?'<del>null</del>':$row[$item];
-                            array_push($list, $value);
-                        }
-                        array_push($data,$list);
-                        $count ++;
-                    }
-                    $result = $con->query("SELECT COUNT(*) FROM $databaseName.$tableName");
-                    if($row = $result->fetch_assoc())
-                        $totalPage = ceil(intval($row['COUNT(*)'])/$limit);
-                }
 
             }
             $result->free_result();
@@ -277,12 +288,14 @@ function LoadTableData($databaseName, $tableName, $page = 1,$limit = 25) {
         $page = 0;
     return $success?json_encode(array('success'=>$success,'colHeaders'=>$colHeaders,'columns'=>$columns,'data'=>$data,'totalPage'=>$totalPage,'currentPage'=>$page)):json_encode(array('success'=>$success,'msg'=>$msg));
 }
-
+// 删除一条数据记录
 function DeleteTableData($databaseName, $tableName, $condition) {
     $con_info = explode(',', $_COOKIE['funnysql']);
     $con = new mysqli($con_info[0], $con_info[2], $con_info[3], '', $con_info[1]);
     $success = false;
     $msg = null;
+    $adaa = $condition;
+    $condition = substr($condition, 0, strlen($condition) -4);
     if($con->connect_errno)
         $msg = $con->connect_error;
     else {
@@ -296,9 +309,9 @@ function DeleteTableData($databaseName, $tableName, $condition) {
         }
     }
     $con->close();
-    return json_encode(array('success'=>$success,'msg'=>$msg));
+    return json_encode(array('success'=>$success,'msg'=>$msg, 'sql'=>$adaa));
 }
-
+// 获取数据库列表
 function GetDatabases() {
     $con_info = explode(',', $_COOKIE['funnysql']);
     $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
@@ -321,4 +334,124 @@ function GetDatabases() {
         }
     }
     return json_encode(array('success'=>$success,'msg'=>$msg,'data'=>$data));
+}
+
+
+/* POST 请求处理函数 */
+// login页面根据用户输入设置连接
+function SetConnect($host,$port,$userName,$password) {
+    global $path;
+    $success = false;
+    $msg = '';
+    $con = new mysqli($host, $userName, $password,'',$port);
+    if($con->connect_errno) {
+        $msg = $con->connect_error;
+    } else {
+        $success = true;
+        $cookie = $host.','.$port.','.$userName.','.$password;
+        setcookie('funnysql',$cookie,time()+60*60*24,$path);
+        $msg = '连接成功！';
+    }
+    $con->close();
+    return json_encode(array('success'=>$success,'msg'=>$msg));
+}
+// 移除连接
+function RemoveConnect(){
+    global $path;
+    setcookie('funnysql','',time()-60*60*24,$path);
+}
+/**
+ * 插入多行数据
+ * 
+ * @param: $db string 数据库名
+ * @param: $tb string 数据表名
+ * @param: $data array 二维数组，插入数据的集合，数组中每一项为一个整条插入的数据
+ * @return: string (json)
+ * 
+ * @author: jeffee 
+ */
+function InsertData($db, $tb, $data) {
+    $con_info = explode(',', $_COOKIE['funnysql']);
+    $con = new mysqli($con_info[0], $con_info[2], $con_info[3], '', $con_info[1]);
+    $success = false;
+    $msg = null;
+
+    if($con->connect_errno) {
+        $msg = $con->connect_error;
+    } else {
+        if(!$con->select_db($db))
+            $msg = "不存在数据库$db";
+        else {
+            $result = $con->query("DESC $tb");
+            if($con->errno)
+                $msg = $con->error;
+            else {
+                $columns = array();
+                while($row = $result->fetch_assoc())
+                    array_push($columns, $row['Field']);
+                $strColumns = implode(',',$columns);
+                $arrValue = array();
+                foreach ($data as $value){
+                    $temp = array();
+
+                    foreach ($value as $index =>$column) {
+                        array_push($temp, CleanUpData($db, $tb, $columns[$index], $column));
+                    }
+                    array_push($arrValue, '('.implode(',',$temp).')');
+                }
+                $con->query('set autocommit=0');
+                $con->begin_transaction();
+                $insertSuccess = true;
+
+                foreach ($arrValue as $index=>$item) {
+                    $con->query("INSERT INTO $tb($strColumns) VALUES $item");
+                    if($con->errno) {
+                        $insertSuccess = false;
+                        $msg .= $con->error.'<br>';
+                    }
+                }
+                if($insertSuccess) {
+                    $success = true;
+                    $msg = '数据插入成功！';
+                    $con->commit();
+                } else {
+                    $msg = substr($msg,0, strlen($msg) -4);
+                    $con->rollback();
+                }
+            }
+        }
+    }
+    $con->close();
+    return json_encode(array('success'=>$success, 'msg' => $msg));
+}
+/**
+ * 清洗数据值，用于InsertData
+ * $value 为空时，返回字符串 "null";
+ * $value 不为空时，如果对应列的属性为数字类型，返回原值，否则返回两侧添加"的$value值
+ * 
+ * @param: $db string 数据库名
+ * @param: $tb string 数据表名
+ * @param: $column string 插入的列名
+ * @param: $value string 需要清洗的值
+ * @return: string
+ * 
+ * @author: jeffee
+ */
+function CleanUpData($db, $tb, $column,$value) {
+    if($value == null)
+        return 'null';
+    else {
+        $con_info = explode(',', $_COOKIE['funnysql']);
+        $con = new mysqli($con_info[0], $con_info[2], $con_info[3], '', $con_info[1]);
+        $isDigital = array('tinyint','smallint','mediumint','int','bigint','float','double','decimal');
+        $result = $con->query("SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='$db' AND TABLE_NAME='$tb' AND COLUMN_NAME='$column'");
+        if($row = $result->fetch_assoc()) {
+            if(in_array($row['DATA_TYPE'],$isDigital))
+                return $value;
+            else
+                return '"'.$value.'"';
+        }
+        $result->close();
+        $con->close();
+    }
 }
