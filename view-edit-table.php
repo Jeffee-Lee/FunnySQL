@@ -1,9 +1,9 @@
 <?php
-include('/lib/settings.php');
-if(!array_key_exists('funnysql', $_COOKIE))
-    header("Location: ".$domain.$path."login");
-$con_info = explode(',', $_COOKIE['funnysql']);
-$con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
+include('./lib/settings.php');
+if(!array_key_exists('session', $_COOKIE))
+    header("Location: ".$PATH."login");
+$con_info = json_decode(base64_decode($_COOKIE['session']));
+$con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
 
 // 获取数据库列表
 $databases = array();
@@ -11,8 +11,6 @@ $result = $con->query('SHOW DATABASES;');
 while($row = $result->fetch_assoc())
     array_push($databases, $row['Database']);
 $result->free_result();
-
-
 
 
 // 连接的数据库
@@ -37,7 +35,7 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
 $page = 1;
 if(isset($_GET['p']) and !empty($_GET['p']))
     $page = $_GET['p'];
-$con->close();
+
 ?>
 <!doctype html>
 <html style="height: 100%;">
@@ -46,16 +44,16 @@ $con->close();
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>数据表 - FunnySQL</title>
-    <link rel="shortcut icon" href="<?php echo $path;?>res/favicon.png">
-    <link rel="stylesheet" href="<?php echo $path?>lib/jquery-ui/jquery-ui.min.css">
-    <link rel="stylesheet" href="<?php echo $path?>lib/handsontable/handsontable.full.min.css">
-    <link rel="stylesheet" href="<?php echo $path?>lib/css.css">
+    <title><?php echo $PAGE_TITLE_TABLE;?></title>
+    <link rel="shortcut icon" href="<?php echo $PAGE_ICON;?>">
+    <link rel="stylesheet" href="<?php echo $PATH?>lib/jquery-ui/jquery-ui.min.css">
+    <link rel="stylesheet" href="<?php echo $PATH?>lib/handsontable/handsontable.full.min.css">
+    <link rel="stylesheet" href="<?php echo $PATH?>lib/css.css">
 </head>
 <style>
     .pageSkip {
         display: inline-block;
-        background: transparent url('<?php echo $path.'res/arrow-left.png';?>') no-repeat -10px -10px;
+        background: transparent url('<?php echo $PATH.'res/arrow-left.png';?>') no-repeat -10px -10px;
         text-indent: -999em;
         background-size: 40px;
         opacity: 0.7;
@@ -64,12 +62,14 @@ $con->close();
         height: 20px;
     }
     .pageNext {
-        background-image: url('<?php echo $path.'res/arrow-right.png';?>');
+        background-image: url('<?php echo $PATH.'res/arrow-right.png';?>');
     }
     .changPage {
         margin-top: 10px;
     }
-
+    #createIndex select, #createIndex input {
+        width: 30%;
+    }
 </style>
 <body>
 <div id="msg"><span id="msg-body"></span><span id="msg-close" style="cursor: pointer;">X</span></div>
@@ -80,26 +80,37 @@ $con->close();
         <button>确定</button>
         <button>取消</button></div></div>
 <div class="head">
-    <a href="<?php echo $path?>" id="nav-home">
-        <img src="<?php echo $path?>res/mysql.png"  class="icon home" width="18px" height="18px">&nbsp;概述</a>
-    <a href="<?php echo $path?>database" id="nav-database">
-        <img src="<?php echo $path?>res/database.png"  class="icon database" width="18px" height="18px">&nbsp;数据库</a>
-    <a href="<?php echo $path?>new-delete-table" id="nav-table">
-        <img src="<?php echo $path?>res/table.png"  class="icon table" width="18px" height="18px">&nbsp;数据表
+    <a href="<?php echo $PATH?>" id="nav-home">
+        <img src="<?php echo $PATH?>res/mysql.png"  class="icon home icon-inactive">
+        <img src="<?php echo $PATH?>res/mysql_active.png"  class="icon home icon-active">
+        &nbsp;概述
     </a>
-    <a href="javascript:void(0)" id="sql">&nbsp;SQL</a>
-    <a href="#" id="exit">X</a>
+    <a href="<?php echo $PATH?>database" id="nav-database">
+        <img src="<?php echo $PATH?>res/database.png"  class="icon database icon-inactive" >
+        <img src="<?php echo $PATH?>res/database_active.png"  class="icon database icon-active">
+        &nbsp;数据库
+    </a>
+    <a href="<?php echo $PATH?>new-delete-table" id="nav-table" class="active">
+        <img src="<?php echo $PATH?>res/table_active.png"  class="icon table">
+        &nbsp;数据表
+    </a>
+    <a href="<?php echo $PATH."sql"?>" id="nav-sql">
+        <img src="<?php echo $PATH?>res/sql.png"  class="icon sql icon-inactive" >
+        <img src="<?php echo $PATH?>res/sql_active.png"  class="icon sql icon-active">
+        &nbsp;SQL
+    </a>
+    <a href="javascript:void(0)" id="exit">X</a>
 </div>
 
 <div class="more" id="more">&nbsp;&nbsp;更多操作&nbsp;&nbsp;</div>
 <div class="more" id="more-info">
-    <a href="<?php echo $path;?>new-delete-table" id="newDelete" class="subMore"> 新建/删除 </a>
-    <a href="<?php echo $path;?>view-edit-table" id="viewEdit"  class="subMore"> 查看/编辑 </a>
+    <a href="<?php echo $PATH;?>new-delete-table" id="newDelete" class="subMore"> 新建/删除 </a>
+    <a href="<?php echo $PATH;?>view-edit-table" id="viewEdit"  class="subMore"> 查看/编辑 </a>
 </div>
 
 <div class="block" id="popUpEdit" style="display: none;">
     <div class="block-head"><span id="editTitle">编辑数据</span><span id="editClose">X</span></div>
-    <div class="block-body" id="popUpEdit-body"><div id="editTable"></div><button>确定</button><button>取消</button></div>
+    <div class="block-body" id="popUpEdit-body"><div id="editTable"></div><button id="editSubmit">确定</button><button>取消</button></div>
 </div>
 <div class="main">
     <div class="left">
@@ -140,6 +151,33 @@ $con->close();
                 <button id="insertSubmit">&nbsp;&nbsp;提交&nbsp;&nbsp;</button>
             </div>
         </div>
+        <div class="block" style="margin-top: 30px;">
+            <div class="block-head">添加索引</div>
+            <div class="block-body" id="createIndex">
+                <select name="索引列" id="indexColumn" title="索引列" class="input">
+                    <?php
+                    $sql = "DESC `{$dba}`.`{$tb}`";
+                    $result = $con->query($sql);
+                    if($result->fetch_assoc())
+                        echo 'hah';
+                    while($row = $result->fetch_assoc()) {
+                        $value =  $row["Field"];
+                        $output = '<option value="' . $value . '" ';
+                        $output .= '>'.$value.'</option>';
+                        echo $output;
+                    }
+                    ?>
+                </select>
+                <select name="索引类型" id="indexType" title="索引类型" class="input">
+                    <option value="0">普通索引</option>
+                    <option value="1">唯一索引</option>
+                    <option value="2">全文索引</option>
+                    <option value="3">空间索引</option>
+                </select>
+                <input type="text" class="input" title="索引名" placeholder="索引名" id="indexName">
+                <button>&nbsp;&nbsp;添加&nbsp;&nbsp;</button>
+            </div>
+        </div>
     </div>
     <div class="right">
         <div class="block">
@@ -159,15 +197,15 @@ $con->close();
 
 
 </div>
-<script src="<?php echo $path?>lib/jquery.min.js"></script>
-<script src="<?php echo $path?>lib/jquery-ui/jquery-ui.js"></script>
-<script src="<?php echo $path?>lib/handsontable/handsontable.full.min.js"></script>
-<script src="<?php echo $path?>lib/jquery/jquery.cookie.min.js"></script>
+<script src="<?php echo $PATH?>lib/jquery.min.js"></script>
+<script src="<?php echo $PATH?>lib/jquery-ui/jquery-ui.js"></script>
+<script src="<?php echo $PATH?>lib/jquery/jquery.cookie.min.js"></script>
+<script src="<?php echo $PATH?>lib/handsontable/handsontable.full.min.js"></script>
+<script src="<?php echo $PATH?>lib/js.js"></script>
 <script>
 
     $(document).ready(function() {
         /* Other Start */
-        $('#nav-table').addClass('active');
         $('#more').hover(function () {
             $('#more').fadeOut('slow');
             $('#more-info').fadeIn('slow');
@@ -179,45 +217,16 @@ $con->close();
         /* Other End */
 
         /* Common Part Start */
-        function showLoader() {
-            $('#loader').show();
-        }
-        function hideLoader() {
-            $('#loader').hide();
-        }
-        function showMsg(Message, type) {
-            let color = 'red';
-            if(type === undefined || type === 'error')
-                color = "red";
-            else if (type === 'success')
-                color = "#00ff2b";
-            if(Message != null) {
-                $("#msg").css('background',color).addClass("msgShow").find('#msg-body').html(Message).parent('#msg').show();
-                setTimeout(function(){
-                    $("#msg").removeClass("msgShow").find('#msg-body').html('').parent('#msg').hide();
-                }, 3333)
-            }
-        }
-        $("#msg-close").click(function () {
-            $("#msg").removeClass("msgShow").find('#msg-body').text('').parent('#msg').hide();
-        });
-        $("#exit").click(function () {
-            $("#close, #fullScreen").show();
-        });
         $('.close-body button:first-child').click(function () {
             $.ajax({
-                url: '<?php echo $path;?>lib/Processing.php',
+                url: '<?php echo $PATH;?>lib/Processing.php',
                 method: 'post',
                 data: {'type': '2'},
                 success: function () {
-                    window.location.href = '<?php echo $path;?>';
+                    window.location.href = '<?php echo $PATH;?>';
                 }
             });
         });
-        $('.close-head a, .close-body button:last-child').click(function () {
-            $("#close, #fullScreen").hide();
-        });
-        $("#close").draggable();
         /* Common Part End */
 
         /* Left Block 1 Start */
@@ -228,6 +237,7 @@ $con->close();
         let colHeaders = null;
         // 数据库选择改变
         $('#databaseName').change(function () {
+            $(this).blur();
             let db = $(this).val();
             reloadSelectTable(db);
             currentPage = 1;
@@ -239,6 +249,7 @@ $con->close();
         });
         // 数据表选择改变
         $('#tableName').change(function () {
+            $(this).blur();
             let db = $('#databaseName').val();
             let tb = $(this).val();
             currentPage = 1;
@@ -249,7 +260,7 @@ $con->close();
             if(db === undefined)
                 db = '<?php echo $dba;?>';
             $.ajax({
-                url: '<?php echo $domain.$path.'lib/Processing.php?type=6&db=';?>'+db,
+                url: '<?php echo $PATH.'lib/Processing.php?type=6&db=';?>'+db,
                 dataType: 'json',
                 timeout: 3000,
                 success: function (data) {
@@ -303,7 +314,7 @@ $con->close();
                 showMsg('啥都没填，就别提交了！');
             else {
                 $.ajax({
-                    url : '<?php echo $path?>lib/Processing',
+                    url : '<?php echo $PATH?>lib/Processing',
                     method: 'post',
                     dataType: 'json',
                     timeout: 3000,
@@ -343,7 +354,7 @@ $con->close();
             if(page === undefined)
                 page = '<?php echo $page;?>';
             $.ajax({
-                url: '<?php echo $domain.$path."lib/Processing.php?type=7&db=";?>'+db + '&tb=' + tb + '&p='+ page,
+                url: '<?php echo $PATH."lib/Processing.php?type=7&db=";?>'+db + '&tb=' + tb + '&p='+ page,
                 dataType: 'json',
                 beforeSend: function(){
                     showLoader();
@@ -371,11 +382,12 @@ $con->close();
                         dataTable.loadData(data.data);
                         currentPage = data.currentPage;
                         totalPage = data.totalPage;
+                        updateIndexColumnsFromArray(colHeaders);
                         originalDb = db;
                         originalTb = tb;
-                        window.history.replaceState({},'','<?php echo $domain.$path.basename(__FILE__,'.php');?>?p='+currentPage+'&db='+db + '&tb='+tb);
+                        window.history.replaceState({},'','<?php echo $PATH.basename(__FILE__,'.php');?>?p='+currentPage+'&db='+db + '&tb='+tb);
                         $('#pageInfo').html(currentPage + '/' + totalPage);
-                        $('#blockRight1-head').html(tb + "<img id=\"refresh\" src=\"<?php echo $path?>res/refresh.png\" title=\"刷新\"/>");
+                        $('#blockRight1-head').html(tb + "<img id=\"refresh\" src=\"<?php echo $PATH?>res/refresh.png\" title=\"刷新\"/>");
                         $('#refresh').click(function () {
                             loadDataTable(originalDb,originalTb, 1);
                         });
@@ -390,7 +402,7 @@ $con->close();
                                 i ++;
                             }
                             $.ajax({
-                                url: '<?php echo $domain.$path."lib/Processing.php?type=8&db=";?>'+db + '&tb=' + tb + '&p='+ page + '&condition='+ condition,
+                                url: '<?php echo $PATH."lib/Processing.php?type=8&db=";?>'+db + '&tb=' + tb + '&p='+ page + '&condition='+ condition,
                                 dataType : 'json',
                                 timeout: 3000,
                                 success: function (data) {
@@ -409,6 +421,7 @@ $con->close();
                             let load = [];
                             load.push(dataTable.getDataAtRow(parseInt(selectRow)).slice(2,));
                             editTable.loadData(load);
+                            $('#popUpEdit').attr('row',selectRow);
                             $('#fullScreen,#popUpEdit').show();
                         });
 
@@ -429,14 +442,38 @@ $con->close();
             height: 70,
         });
 
-        // window resize 后会使得表格中的点击触发事件失效，只能重新加载表格，暂时没有找到其他的解决方法
         $( window ).resize(function () {
             loadDataTable(originalDb, originalTb, currentPage);
         });
+
         $("#editClose, #popUpEdit-body button:last-child").click(function () {
             $('#fullScreen,#popUpEdit').hide();
         });
-        $("#popUpEdit").draggable();
+        $("#editSubmit").click(function () {
+            let beforeChange = dataTable.getDataAtRow(parseInt($("#popUpEdit").attr("row"))).slice(2,);
+            let afterChange = editTable.getDataAtRow(0);
+            if(JSON.stringify(beforeChange) === JSON.stringify(afterChange))
+                alert('没修改');
+            else {
+                $.ajax({
+                    url: '<?php echo $PATH."lib/Processing.php"?>',
+                    method: 'post',
+                    data: {'type':'4','db':originalDb,'tb':originalTb,'beforeChange':beforeChange,'afterChange':afterChange},
+                    dataType: 'json',
+                    timeout: 3000,
+                    success: function (data) {
+                        if(data.success) {
+                            $('#fullScreen,#popUpEdit').hide();
+                            showMsg(data.msg,'success');
+                            loadDataTable(originalDb,originalTb,currentPage);
+                        } else {
+                            showMsg(data.msg);
+                        }
+                    }
+                })
+            }
+        });
+
         $("#fullScreen").click(function () {
             $('#fullScreen,#popUpEdit,#close').hide();
         });
@@ -486,8 +523,38 @@ $con->close();
         });
 
         /* Right Part end */
-
+        function updateIndexColumnsFromArray(arr) {
+            let html = '';
+            for(let i = 2; i<arr.length;i++)
+                html += '<option value="'+ arr[i] +'">' + arr[i] + "</option>";
+            $("#indexColumn").html(html);
+        }
+        $("#createIndex button").click(function () {
+           let indexColumn = $("#indexColumn").val();
+           let indexType = $("#indexType").val();
+           let indexName = $("#indexName").val();
+           let typeName = ['普通索引','唯一索引','全文索引','空间索引']
+           if(indexName === '')
+               showMsg("请填写索引名！");
+           else {
+               if(confirm("确定在表 "+originalTb +' 上的列 '+ indexColumn+' 添加' + typeName[parseInt(indexType)] + ': '+indexName)) {
+                   $.ajax({
+                       url: '<?php echo $PATH."lib/Processing.php?type=10&db=";?>'+originalDb + '&tb=' + originalTb + '&col='+ indexColumn + '&indexType='+ indexType + '&name=' + indexName,
+                       dataType: 'json',
+                       timeout: 3000,
+                       success: function (data) {
+                           if(!data.success) {
+                               showMsg(data.msg);
+                               return;
+                           }
+                           showMsg(data.msg,'success');
+                       }
+                   })
+               }
+           }
+        });
     });
 </script>
 </body>
 </html>
+<?php $con->close();?>

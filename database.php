@@ -1,9 +1,9 @@
 <?php
 include('./lib/settings.php');
-if(!array_key_exists('funnysql', $_COOKIE))
-    header("Location: http://10.242.8.182/funnysql/login");
-$con_info = explode(',', $_COOKIE['funnysql']);
-$con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
+if(!array_key_exists('session', $_COOKIE))
+    header("Location: ".$PATH."login");
+$con_info = json_decode(base64_decode($_COOKIE['session']));
+$con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
 ?>
 <!doctype html>
 <html style="height: 100%;">
@@ -12,11 +12,11 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>数据库 - FunnySQL</title>
-    <link rel="shortcut icon" href="<?php echo $path;?>res/favicon.png">
-    <link rel="stylesheet" href="<?php echo $path?>lib/jquery-ui/jquery-ui.min.css">
-    <link rel="stylesheet" href="<?php echo $path?>lib/handsontable/handsontable.full.min.css">
-    <link rel="stylesheet" href="<?php echo $path?>lib/css.css">
+    <title><?php echo $PAGE_TITLE_DATABASE;?></title>
+    <link rel="shortcut icon" href="<?php echo $PAGE_ICON;?>">
+    <link rel="stylesheet" href="<?php echo $PATH?>lib/jquery-ui/jquery-ui.min.css">
+    <link rel="stylesheet" href="<?php echo $PATH?>lib/handsontable/handsontable.full.min.css">
+    <link rel="stylesheet" href="<?php echo $PATH?>lib/css.css">
 
 </head>
 <style>
@@ -35,15 +35,26 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
         <button>确定</button>
         <button>取消</button></div></div>
 <div class="head">
-    <a href="<?php echo $path?>" id="nav-home">
-        <img src="<?php echo $path?>res/mysql.png"  class="icon home" width="18px" height="18px">&nbsp;概述</a>
-    <a href="<?php echo $path?>database" id="nav-database">
-        <img src="<?php echo $path?>res/database.png"  class="icon database" width="18px" height="18px">&nbsp;数据库</a>
-    <a href="<?php echo $path?>new-delete-table" id="nav-table">
-        <img src="<?php echo $path?>res/table.png"  class="icon table" width="18px" height="18px">&nbsp;数据表
+    <a href="<?php echo $PATH?>" id="nav-home">
+        <img src="<?php echo $PATH?>res/mysql.png"  class="icon home icon-inactive">
+        <img src="<?php echo $PATH?>res/mysql_active.png"  class="icon home icon-active">
+        &nbsp;概述
     </a>
-    <a href="javascript:void(0)" id="sql">&nbsp;SQL</a>
-    <a href="#" id="exit">X</a>
+    <a href="<?php echo $PATH?>database" id="nav-database" class="active">
+        <img src="<?php echo $PATH?>res/database_active.png"  class="icon database">
+        &nbsp;数据库
+    </a>
+    <a href="<?php echo $PATH?>new-delete-table" id="nav-table">
+        <img src="<?php echo $PATH?>res/table.png"  class="icon table icon-inactive">
+        <img src="<?php echo $PATH?>res/table_active.png"  class="icon table icon-active">
+        &nbsp;数据表
+    </a>
+    <a href="<?php echo $PATH."sql"?>" id="nav-sql">
+        <img src="<?php echo $PATH?>res/sql.png"  class="icon sql icon-inactive" >
+        <img src="<?php echo $PATH?>res/sql_active.png"  class="icon sql icon-active">
+        &nbsp;SQL
+    </a>
+    <a href="javascript:void(0)" id="exit">X</a>
 </div>
 
 <div class="main">
@@ -73,79 +84,79 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
                             <option value="utf8mb4_unicode_ci" title="Unicode (UCA 4.0.0), 不区分大小写">utf8mb4_unicode_ci</option>
                         </optgroup>
                     </select>
-                    <br>
-                    <button id="submitCreate" style="margin-bottom: 5px">&nbsp;&nbsp;创建&nbsp;&nbsp;</button>
+                    <div>
+                        <button id="submitCreate" style="margin-bottom: 5px">&nbsp;&nbsp;创建&nbsp;&nbsp;</button>
+                    </div>
+
                 </form>
             </div>
         </div>
         <div class="block" style="margin-top: 30px">
             <div class="block-head">修改数据库编码</div>
-            <div class="block-body"></div>
+            <div class="block-body">
+                <select name="dbList" title="数据库名" class="input dbList"></select>
+                <select name="change_db_collation" class="input" title="新的数据库编码">
+                    <optgroup label="gbk" title="GBK Simplified Chinese">
+                        <option value="gbk_bin" title="简体中文, 二进制">gbk_bin</option>
+                        <option value="gbk_chinese_ci" title="简体中文, 不区分大小写">gbk_chinese_ci</option>
+                    </optgroup>
+                    <optgroup label="utf8" title="UTF-8 Unicode">
+                        <option value="utf8_bin" title="Unicode, 二进制">utf8_bin</option>
+                        <option value="utf8_general_ci" title="Unicode, 不区分大小写">utf8_general_ci</option>
+                        <option value="utf8_general_mysql500_ci" title="Unicode (MySQL 5.0.0), 不区分大小写">utf8_general_mysql500_ci</option>
+                        <option value="utf8_unicode_520_ci" title="Unicode (UCA 5.2.0), 不区分大小写">utf8_unicode_520_ci</option>
+                        <option value="utf8_unicode_ci" title="Unicode, 不区分大小写" selected>utf8_unicode_ci</option>
+                    </optgroup>
+                    <optgroup label="utf8mb4" title="UTF-8 Unicode">
+                        <option value="utf8mb4_bin" title="Unicode (UCA 4.0.0), 二进制">utf8mb4_bin</option>
+                        <option value="utf8mb4_general_ci" title="Unicode (UCA 4.0.0), 不区分大小写">utf8mb4_general_ci</option>
+                        <option value="utf8mb4_unicode_520_ci" title="Unicode (UCA 5.2.0), 不区分大小写">utf8mb4_unicode_520_ci</option>
+                        <option value="utf8mb4_unicode_ci" title="Unicode (UCA 4.0.0), 不区分大小写">utf8mb4_unicode_ci</option>
+                    </optgroup>
+                </select>
+                <div>
+                    <button id="submitChange">&nbsp;&nbsp;修改&nbsp;&nbsp;</button>
+                </div>
+            </div>
+        </div>
+        <div class="block" style="margin-top: 30px;">
+            <div class="block-head">备份数据库</div>
+            <div class="block-body">
+                <select name="backup_db" title="数据库名" class="input dbList" ></select>
+                <button id="backup">&nbsp;&nbsp;备份&nbsp;&nbsp;</button>
+            </div>
         </div>
     </div>
     <div class="right" >
         <div class="block">
-            <div class=" block-head">删除数据库<img id="refresh" src="<?php echo $path?>res/refresh.png" width="16px" height="16px" title="刷新"/></div>
+            <div class=" block-head">删除数据库<img id="refresh" src="<?php echo $PATH?>res/refresh.png" width="16px" height="16px" title="刷新"/></div>
             <div class="block-body">
                 <div id="databaseTable"></div>
             </div>
         </div>
 
 
-</div>
-<script src="<?php echo $path?>lib/jquery.min.js"></script>
-<script src="<?php echo $path?>lib/jquery-ui/jquery-ui.js"></script>
-<script src="<?php echo $path?>lib/handsontable/handsontable.full.min.js"></script>
-<script src="<?php echo $path?>lib/jquery/jquery.cookie.min.js"></script>
-
+    </div>
+<script src="<?php echo $PATH?>lib/jquery.min.js"></script>
+<script src="<?php echo $PATH?>lib/jquery-ui/jquery-ui.js"></script>
+<script src="<?php echo $PATH?>lib/jquery/jquery.cookie.min.js"></script>
+<script src="<?php echo $PATH?>lib/handsontable/handsontable.full.min.js"></script>
+<script src="<?php echo $PATH?>lib/js.js"></script>
 
 <script>
 
     $(document).ready(function(){
-        /* Other Start */
-        $('#nav-database').addClass('active');
-        /* Other End */
-
         /* Common Part Start */
-        function showLoader() {
-            $('#loader').show();
-        }
-        function hideLoader() {
-            $('#loader').hide();
-        }
-        function showMsg(Message, type) {
-            let color = 'red';
-            if(type === undefined || type === 'error')
-                color = "red";
-            else if (type === 'success')
-                color = "#00ff2b";
-            if(Message != null) {
-                $("#msg").css('background',color).addClass("msgShow").find('#msg-body').text(Message).parent('#msg').show();
-                setTimeout(function(){
-                    $("#msg").removeClass("msgShow").find('#msg-body').text('').parent('#msg').hide();
-                }, 3333)
-            }
-        }
-        $("#msg-close").click(function () {
-            $("#msg").removeClass("msgShow").hide().find('#msg-body').text('');
-        });
-        $("#exit").click(function () {
-            $("#close, #fullScreen").show();
-        });
         $('.close-body button:first-child').click(function () {
             $.ajax({
-                url: '<?php echo $path;?>lib/Processing.php',
+                url: '<?php echo $PATH;?>lib/Processing.php',
                 method: 'post',
                 data: {'type': '2'},
                 success: function () {
-                    window.location.href = '<?php echo $path;?>';
+                    window.location.href = '<?php echo $PATH;?>';
                 }
             });
         });
-        $('.close-head a, .close-body button:last-child').click(function () {
-            $("#close, #fullScreen").hide();
-        });
-        $("#close").draggable();
         /* Common Part End */
 
 
@@ -155,27 +166,48 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
             let charset = $('select[name="db_collation"]').val();
             if(name !== '') {
                 $.ajax({
-                    url: '<?php echo $domain.$path;?>lib/Processing.php?type=1&databaseName=' + name + '&collationName=' + charset,
+                    url: '<?php echo $PATH;?>lib/Processing.php?type=1&databaseName=' + name + '&collationName=' + charset,
                     dataType: 'json',
                     timeout: 3000,
                     success: function (data) {
                         if(data.success) {
                             showMsg(data.msg,'success');
                             loadDatabases();
-                        }
-                        else
+                        } else
                             showMsg(data.msg, 'error');
                     },
                     error: function () {
                         showMsg('连接错误,请稍后重试!','error')
-
                     }
                 });
             }
         });
 
-        let container = document.getElementById('databaseTable');
-        let hot = new Handsontable(container, {
+        $("#submitChange").click(function () {
+           let db =  $("select[name='dbList']").val();
+           let collation = $('select[name="change_db_collation"]').val();
+           $.ajax({
+               url: '<?php echo $PATH;?>lib/Processing.php?type=11&db=' + db + '&collation=' + collation,
+               dataType: 'json',
+               timeout: 3000,
+               success: function (data) {
+                   if(data.success) {
+                       showMsg(data.msg,'success');
+                       loadDatabases();
+                   } else {
+                       showMsg(data.msg);
+                   }
+               },
+               error: function () {
+                   showMsg('连接错误,请稍后重试!','error')
+               }
+           })
+        });
+        $("#backup").click(function () {
+            let db = $("select[name='backup_db']").val();
+            window.location = '<?php echo $PATH;?>lib/api/backupDb.php?db=' + db;
+        });
+        let hot = new Handsontable(document.getElementById('databaseTable'), {
             fillHandle: false,
             stretchH: 'all',
             colHeaders: ['', '数据库名', '数据库编码'],
@@ -183,6 +215,7 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
             columnSorting: {
                 indicator: true
             },
+            disableVisualSelection: true,
             columns: [
                 {
                     width: 30,
@@ -199,9 +232,33 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
                 }
             ]
         });
+        function loadDbSelect(dbList){
+            $(".dbList").html(dbList);
+        }
+        function deleteDbClick() {
+            $('.deleteDatabase').unbind("click").click(function () {
+                let db = $(this).attr('db');
+                if(confirm('确定删除数据库'+ db + '吗？'))
+                    $.ajax({
+                        url: '<?php echo $PATH."lib/Processing.php?type=2&db=";?>' + db,
+                        dataType: 'json',
+                        timeout: 3000,
+                        success: function (data) {
+                            if(data.success) {
+                                showMsg(data.msg,'success');
+                                loadDatabases();
+                            } else
+                                showMsg(data.msg, 'error');
+                        },
+                        error: function () {
+                            showMsg('连接错误,请稍后重试!','error');
+                        }
+                    });
+            });
+        }
         function loadDatabases(){
             $.ajax({
-                url: '<?php echo $path."lib/Processing.php?type=9";?>',
+                url: '<?php echo $PATH."lib/Processing.php?type=9";?>',
                 dataType: 'json',
                 timeout: 3000,
                 beforeSend: function() {
@@ -210,25 +267,7 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
                 success: function (data) {
                     if(data.success) {
                         hot.loadData(data.data);
-                        $('.deleteDatabase').click(function () {
-                            let db = $(this).attr('db');
-                            if(confirm('确定删除数据库'+ db + '吗？'))
-                                $.ajax({
-                                   url: '<?php echo $path."lib/Processing.php?type=2&db=";?>' + db,
-                                   dataType: 'json',
-                                   timeout: 3000,
-                                   success: function (data) {
-                                       if(data.success) {
-                                           showMsg(data.msg,'success');
-                                           loadDatabases();
-                                       } else
-                                           showMsg(data.msg, 'error');
-                                   },
-                                   error: function () {
-                                       showMsg('连接错误,请稍后重试!','error');
-                                   }
-                             });
-                        });
+                        loadDbSelect(data.dbList);
                     }
                     else
                         showMsg(data.msg,'error');
@@ -245,6 +284,9 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
         $('#refresh').click(function () {
             loadDatabases();
         });
+        setInterval(function () {
+            deleteDbClick();
+        },1000);
     });
 </script>
 </body>

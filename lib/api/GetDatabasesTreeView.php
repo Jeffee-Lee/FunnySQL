@@ -1,6 +1,7 @@
 <?php
-$con_info = explode(',', $_COOKIE['funnysql']);
-$con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
+$con_info = json_decode(base64_decode($_COOKIE['session']));
+$con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+
 $result = $con->query('SHOW DATABASES;');
 $databaseName = array();
 while($row = $result->fetch_assoc())
@@ -17,14 +18,14 @@ foreach ($databaseName as $value)
     {
         $name = $row[sprintf('Tables_in_%s', $value)];
 
-        $temp = array('text'=> $name,'icon'=> './res/table.ico','a_attr'=> array('id'=> 'table-'.$value.'-'.$name));
+        $temp = array('text'=> $name,'icon'=> './res/table-tree.png','a_attr'=> array('id'=> 'table-'.$value.'-'.$name));
         array_push($children, $temp);
 
     }
     $result->free_result();
 
 
-    $temp = array('text'=> $value, 'icon'=>'./res/database.ico', 'a_attr'=> array('id'=> 'database-'.$value), 'children'=>$children);
+    $temp = array('text'=> $value, 'icon'=>'./res/database-tree.png', 'a_attr'=> array('id'=> 'database-'.$value), 'children'=>$children);
     array_push($output,$temp);
 }
 

@@ -33,9 +33,14 @@ if(isset($_GET['type']) and !empty($_GET['type']) ) {
         case '9':
             echo GetDatabases();
             break;
+        case '10':
+            echo CreateIndex($_GET['db'],$_GET['tb'],$_GET['col'],$_GET['indexType'],$_GET['name']);
+            break;
+        case '11':
+            echo AlterDatabase($_GET['db'],$_GET['collation']);
+            break;
     }
 };
-
 // POST 请求处理
 if(isset($_POST['type']) and !empty($_POST['type'])) {
     switch ($_POST['type']) {
@@ -47,6 +52,12 @@ if(isset($_POST['type']) and !empty($_POST['type'])) {
             break;
         case '3':
             echo InsertData($_POST['db'],$_POST['tb'], $_POST['data']);
+            break;
+        case '4':
+            echo UpdateData($_POST['db'],$_POST['tb'],$_POST['beforeChange'],$_POST['afterChange']);
+            break;
+        case '5':
+            echo Sql($_POST["sql"]);
             break;
     }
 };

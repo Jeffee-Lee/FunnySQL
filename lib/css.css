@@ -2,6 +2,7 @@
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+    font-family: 'Microsoft Yahei',sans-serif;
 }
 button {
     margin: 15px 5px 15px 15px;
@@ -9,6 +10,7 @@ button {
     border: 1px solid #d9d9d9;
     background: #cdcdcd1f;
     outline: none;
+    cursor: pointer;
 }
 button:hover {
     background: #d3f3ff;
@@ -34,25 +36,43 @@ a {
     float: left;
     text-decoration: none;
     color: black;
-    padding: .5em .7em .5em .7em;
+    padding: .5em 1.2em .5em 1.2em;
     border-top: inset transparent;
     border-bottom: inset transparent;
+}
+.head a img {
+    height: 20px;
+    width: 20px;
 }
 .head > a > img {
     margin-right: .3em;
     vertical-align: -3px;
 }
+.head > a:not(.active) > img.icon-active {
+    display: none;
+}
+.head > a:not(.active):hover>img.icon-inactive {
+     display: none;
+}
+.head a:not(.active):hover>img.icon-active {
+    display: unset;
+}
 #nav-home:hover,#nav-home.active {
-    border-bottom: inset #006a798f;
+    border-bottom-color: #0091EA;
+    color: #0091EA;
 }
 #nav-database:hover,#nav-database.active{
-    border-bottom: inset #ff000070;
+    border-bottom-color: #ff3030;
+    color: #ff3030;
 }
+
 #nav-table:hover,#nav-table.active{
-    border-bottom: inset #005aff69;
+    border-bottom-color: #00C853;
+    color: #00C853;
 }
-#sql:hover,#sql.active{
-    border-bottom: inset #00ffa187;
+#nav-sql:hover,#nav-sql.active{
+    border-bottom-color: #311B92;
+    color: #311B92;
 }
 #exit {
     float: right;
@@ -71,7 +91,7 @@ a {
     width: 100%;
     height: 100%;
     background: #00000047;
-    z-index: 9990;
+    z-index: 9980;
     position: fixed;
     top: 0;
     left: 0;
@@ -150,14 +170,16 @@ a {
     top: 45%;
     left: 45%;
     z-index: 9999;
-    border: 8px solid #00e8f38a;
+    border: 6px solid #00f3dd47;
     border-radius: 70%;
-    border-top: 8px solid #3498db;
-    width: 60px;
-    height: 60px;
+    border-top: 6px solid #3498dbad;
+    width: 50px;
+    height: 50px;
     -webkit-animation: spin 2s linear infinite; /* Safari */
     animation: spin 2s linear infinite;
 }
+
+
 /* Safari */
 @-webkit-keyframes spin {
     0% { -webkit-transform: rotate(0deg); }
@@ -265,12 +287,13 @@ a {
 .block{
     border-radius: 10px;
     border: 1px solid #d9d9d9;
+    animation: bounceInUp 1s;
 }
 .block-head{
     background: #fcfcfc;
     border-bottom: 1px solid #d9d9d9;
     color: black;
-    padding: 9px;
+    padding: 9px 9px 9px 16px;
     font-size: 18px;
     border-radius: 10px 10px 0 0;
     cursor: default;
@@ -291,10 +314,10 @@ a {
     font-size: 16px;
     cursor: pointer;
     display: inline-block;
-    z-index: 9999;
+    z-index: 9970;
 }
 #more {
-    background: #fff24694;
+    background: #fff794;
     padding: 10px;
 }
 #more:hover,#newDelete:hover,#viewEdit:hover{
@@ -306,10 +329,10 @@ a {
     margin-right: 0;
 }
 #newDelete {
-    background: #00ff0080;
+    background: #7ffb4a;
 }
 #viewEdit {
-    background: #00f8ff94;
+    background: #6bfbff;
 }
 #more-info {
     display: none;
@@ -329,8 +352,10 @@ a {
     right: 0;
     margin: 0 auto;
     width: 55%;
-    z-index: 9995;
+    z-index: 9990;
     box-shadow: 4px 7px #80808080;
+    animation-name: popUpShow;
+    animation-duration: 1s;
 }
 #editClose {
     float: right;
@@ -347,10 +372,63 @@ a {
  #editClose:active {
     background: #ff6f6d;
 }
-.pika-single {
-    z-index: 99999;
+#popUpEdit-body {
+    padding-bottom: 0;
 }
 
 #dataTable .htAutocompleteArrow {
     display: none;
+}
+
+@keyframes popUpShow {
+    0% {
+        transform: scale(0);
+    }
+    80% {
+        transform: scale(1);
+    }
+    90% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+
+}
+@keyframes bounceInUp {
+    from,
+    60%,
+    75%,
+    90%,
+    to {
+        -webkit-animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+        animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    }
+
+    from {
+        opacity: 0;
+        -webkit-transform: translate3d(0, 3000px, 0);
+        transform: translate3d(0, 3000px, 0);
+    }
+
+    60% {
+        opacity: 1;
+        -webkit-transform: translate3d(0, -20px, 0);
+        transform: translate3d(0, -20px, 0);
+    }
+
+    75% {
+        -webkit-transform: translate3d(0, 10px, 0);
+        transform: translate3d(0, 10px, 0);
+    }
+
+    90% {
+        -webkit-transform: translate3d(0, -5px, 0);
+        transform: translate3d(0, -5px, 0);
+    }
+
+    to {
+        -webkit-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
+    }
 }

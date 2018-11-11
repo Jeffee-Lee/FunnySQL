@@ -3,8 +3,9 @@ include "../settings.php";
 /* GET 请求处理函数 */
 // 创建数据库
 function CreateDatabase($databaseName, $collationName) {
-    $con_info = explode(',', $_COOKIE['funnysql']);
-    $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
+    $con_info = json_decode(base64_decode($_COOKIE['session']));
+    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+
     $success = false;
     $msg = '';
     if($con->connect_errno) {
@@ -27,8 +28,9 @@ function CreateDatabase($databaseName, $collationName) {
 
 // 删除数据库
 function DeleteDatabase($databaseName) {
-    $con_info = explode(',', $_COOKIE['funnysql']);
-    $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
+    $con_info = json_decode(base64_decode($_COOKIE['session']));
+    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+
     $success = false;
     $msg = '';
     $system = array('information_schema', 'mysql', 'performance_schema', 'sys');
@@ -58,8 +60,9 @@ function DeleteDatabase($databaseName) {
 // 创建数据表
 function CreateTable($databaseName, $tableName, $data)
 {
-    $con_info = explode(',', $_COOKIE['funnysql']);
-    $con = new mysqli($con_info[0], $con_info[2], $con_info[3], '', $con_info[1]);
+    $con_info = json_decode(base64_decode($_COOKIE['session']));
+    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+
     $success = false;
     $msg = null;
 
@@ -120,12 +123,13 @@ function CreateTable($databaseName, $tableName, $data)
 }
 // 获取数据库名及编码列表
 function GetDatabaseDetail($databaseName) {
-    $con_info = explode(',', $_COOKIE['funnysql']);
-    $con = new mysqli($con_info[0], $con_info[2], $con_info[3], '', $con_info[1]);
+    $con_info = json_decode(base64_decode($_COOKIE['session']));
+    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+
     $success = false;
     $msg = null;
     $data = array();
-    global $path;
+    global $PATH;
 
     $colHeaders = array('','表名','记录数');
     $columns = array(array('type'=>'text','className'=>'htCenter htMiddle','width'=>20, 'renderer'=>'html'),array('type'=>'text','className'=>'htCenter htMiddle', 'width'=>100, 'renderer'=>'html'),array('type'=>'text','className'=>'htCenter htMiddle', 'width'=>25));
@@ -154,7 +158,7 @@ function GetDatabaseDetail($databaseName) {
                     else {
                         $success = true;
                         if ($row = $result->fetch_assoc())
-                            array_push($data, array('<a href="javascript:void(0)" class="delete-table delete" tb="'.$value.'">删除</a>','<a href="'.$path.'view-edit-table?db='.$databaseName.'&tb='.$value.'" class="access " title="访问数据表 '.$value.'">'.$value.'</a>', $row['COUNT(*)']));
+                            array_push($data, array('<a href="javascript:void(0)" class="delete-table delete" tb="'.$value.'">删除</a>','<a href="'.$PATH.'view-edit-table?db='.$databaseName.'&tb='.$value.'" class="access " title="访问数据表 '.$value.'">'.$value.'</a>', $row['COUNT(*)']));
                     }
                 }
         }
@@ -165,8 +169,9 @@ function GetDatabaseDetail($databaseName) {
 
 // 删除数据表
 function DeleteTable($databaseName, $tableName) {
-    $con_info = explode(',', $_COOKIE['funnysql']);
-    $con = new mysqli($con_info[0], $con_info[2], $con_info[3], '', $con_info[1]);
+    $con_info = json_decode(base64_decode($_COOKIE['session']));
+    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+
     $success = false;
     $msg = null;
     if($con->connect_errno)
@@ -185,9 +190,8 @@ function DeleteTable($databaseName, $tableName) {
 }
 // 获取数据表列表，选择框下拉内嵌代码
 function GetTablesList($databaseName) {
-    $con_info = explode(',', $_COOKIE['funnysql']);
-    $con = new mysqli($con_info[0], $con_info[2], $con_info[3], '', $con_info[1]);
-
+    $con_info = json_decode(base64_decode($_COOKIE['session']));
+    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
 
     $success = false;
     $msg = '';
@@ -209,8 +213,9 @@ function GetTablesList($databaseName) {
 }
 // 获取数据表的数据
 function LoadTableData($databaseName, $tableName, $page = 1,$limit = 30) {
-    $con_info = explode(',', $_COOKIE['funnysql']);
-    $con = new mysqli($con_info[0], $con_info[2], $con_info[3], '', $con_info[1]);
+    $con_info = json_decode(base64_decode($_COOKIE['session']));
+    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+
 
     $success = false;
     $msg = null;
@@ -290,8 +295,9 @@ function LoadTableData($databaseName, $tableName, $page = 1,$limit = 30) {
 }
 // 删除一条数据记录
 function DeleteTableData($databaseName, $tableName, $condition) {
-    $con_info = explode(',', $_COOKIE['funnysql']);
-    $con = new mysqli($con_info[0], $con_info[2], $con_info[3], '', $con_info[1]);
+    $con_info = json_decode(base64_decode($_COOKIE['session']));
+    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+
     $success = false;
     $msg = null;
     $adaa = $condition;
@@ -313,12 +319,14 @@ function DeleteTableData($databaseName, $tableName, $condition) {
 }
 // 获取数据库列表
 function GetDatabases() {
-    $con_info = explode(',', $_COOKIE['funnysql']);
-    $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
+    $con_info = json_decode(base64_decode($_COOKIE['session']));
+    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+
     $success = false;
     $msg = '';
     $data = array();
-    global $path;
+    $dbList = "";
+    global $PATH;
     if($con->connect_errno)
         $msg = $con->connect_error;
     else {
@@ -329,50 +337,122 @@ function GetDatabases() {
         else {
             $success = true;
             while($row = $result->fetch_assoc()) {
-                array_push($data, array('<a href="javascript:void(0)" class="deleteDatabase delete" db="'.$row['SCHEMA_NAME'].'">删除</a>',"<a href='".$path."new-delete-table?db=".$row['SCHEMA_NAME']."' title='访问数据库 ".$row['SCHEMA_NAME']."' class='access'>".$row['SCHEMA_NAME']."</a>",$row['DEFAULT_COLLATION_NAME']));
+                $dbList .= "<option value='{$row['SCHEMA_NAME']}'>{$row['SCHEMA_NAME']}</option>";
+                array_push($data, array('<a href="javascript:void(0)" class="deleteDatabase delete" db="'.$row['SCHEMA_NAME'].'">删除</a>',"<a href='".$PATH."new-delete-table?db=".$row['SCHEMA_NAME']."' title='访问数据库 ".$row['SCHEMA_NAME']."' class='access'>".$row['SCHEMA_NAME']."</a>",$row['DEFAULT_COLLATION_NAME']));
             }
         }
     }
-    return json_encode(array('success'=>$success,'msg'=>$msg,'data'=>$data));
+    return json_encode(array('success'=>$success,'msg'=>$msg,'data'=>$data,"dbList"=>$dbList));
 }
 
+/**
+ * 添加索引
+ *
+ * @param $db string 数据库名
+ * @param $tb string 数据表名
+ * @param $col string 列名
+ * @param $type string 索引类型， 0: 普通索引; 1: 唯一索引; 2: 全文索引; 3: 空间索引
+ * @param $name string 索引名
+ * @return string
+ *
+ * @author jeffee
+ */
+function CreateIndex($db,$tb,$col,$type,$name) {
+    $con_info = json_decode(base64_decode($_COOKIE['session']));
+    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
 
-/* POST 请求处理函数 */
-// login页面根据用户输入设置连接
-function SetConnect($host,$port,$userName,$password) {
-    global $path;
     $success = false;
-    $msg = '';
-    $con = new mysqli($host, $userName, $password,'',$port);
-    if($con->connect_errno) {
+    $msg = null;
+
+    if($con->connect_errno)
         $msg = $con->connect_error;
-    } else {
-        $success = true;
-        $cookie = $host.','.$port.','.$userName.','.$password;
-        setcookie('funnysql',$cookie,time()+60*60*24,$path);
-        $msg = '连接成功！';
+    else {
+        $arrIndex = array('0'=>'','1'=>' UNIQUE','2'=>' FULLTEXT','3'=>' SPATIAL');
+        $sql = "CREATE{$arrIndex[$type]} INDEX $name ON $db.$tb($col)";
+        $con->query($sql);
+        if($con->errno)
+            $msg = $con->error;
+        else {
+            $success = true;
+            $msg = '索引创建成功！';
+        }
     }
     $con->close();
     return json_encode(array('success'=>$success,'msg'=>$msg));
 }
+
+function AlterDatabase($db,$collation) {
+    $con_info = json_decode(base64_decode($_COOKIE['session']));
+    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+
+    $success = false;
+    $msg = null;
+    if($con->connect_errno)
+        $msg = $con->connect_error;
+    else {
+
+        $sql = "ALTER DATABASE $db COLLATE $collation";
+        $con->query($sql);
+        if($con->errno)
+            $msg = $con->error;
+        else {
+            $success = true;
+            $msg = '编码创建成功！';
+        }
+    }
+    $con->close();
+    return json_encode(array('success'=>$success,'msg'=>$msg));
+}
+
+/* POST 请求处理函数 */
+// login页面根据用户输入设置连接
+function SetConnect($host,$port,$userName,$password) {
+    global $PATH;
+
+    function isGetAvailable($name) {
+        return isset($_POST[$name]) && !empty($_POST[$name]);
+    }
+    $success = false;
+    $msg = '';
+    // 判断GET的数据，password字段可以为空
+    if(isGetAvailable('host') && isGetAvailable("port") && isGetAvailable("userName") && isset($_POST["password"])) {
+        $host = $_POST['host'];
+        $port = $_POST["port"];
+        $userName = $_POST["userName"];
+        $password = $_POST['password'];
+        $con = new mysqli($host, $userName, $password, '', $port);
+        if($con->connect_errno)
+            $msg = $con->connect_error;
+        else {
+            setcookie('session',base64_encode(json_encode(array('host'=>$host,"port"=>$port,"userName"=>$userName,"password"=>$password))),time() + 60*60*24, $PATH);
+            $success = true;
+            $msg = "连接成功！";
+        }
+        $con->close();
+    } else
+        $msg = '请检查请求';
+    return json_encode(array('success'=>$success,"msg"=>$msg));
+}
 // 移除连接
 function RemoveConnect(){
-    global $path;
-    setcookie('funnysql','',time()-60*60*24,$path);
+    global $PATH;
+    setcookie('session','',time()-60*60*24,$PATH);
 }
+
 /**
  * 插入多行数据
- * 
- * @param: $db string 数据库名
- * @param: $tb string 数据表名
- * @param: $data array 二维数组，插入数据的集合，数组中每一项为一个整条插入的数据
- * @return: string (json)
- * 
- * @author: jeffee 
+ *
+ * @param $db string 数据库名
+ * @param $tb string 数据表名
+ * @param $data array 二维数组，插入数据的集合，数组中每一项为一个整条插入的数据
+ * @return string
+ *
+ * @author jeffee
  */
 function InsertData($db, $tb, $data) {
-    $con_info = explode(',', $_COOKIE['funnysql']);
-    $con = new mysqli($con_info[0], $con_info[2], $con_info[3], '', $con_info[1]);
+    $con_info = json_decode(base64_decode($_COOKIE['session']));
+    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+
     $success = false;
     $msg = null;
 
@@ -424,25 +504,27 @@ function InsertData($db, $tb, $data) {
     $con->close();
     return json_encode(array('success'=>$success, 'msg' => $msg));
 }
+
 /**
- * 清洗数据值，用于InsertData
+ * 清洗数据值
  * $value 为空时，返回字符串 "null";
  * $value 不为空时，如果对应列的属性为数字类型，返回原值，否则返回两侧添加"的$value值
- * 
- * @param: $db string 数据库名
- * @param: $tb string 数据表名
- * @param: $column string 插入的列名
- * @param: $value string 需要清洗的值
- * @return: string
- * 
- * @author: jeffee
+ *
+ * @param $db string 数据库名
+ * @param $tb string 数据表名
+ * @param $column string 插入的列名
+ * @param $value string 需要清洗的值
+ * @return string
+ *
+ * @author jeffee
  */
 function CleanUpData($db, $tb, $column,$value) {
     if($value == null)
         return 'null';
     else {
-        $con_info = explode(',', $_COOKIE['funnysql']);
-        $con = new mysqli($con_info[0], $con_info[2], $con_info[3], '', $con_info[1]);
+        $con_info = json_decode(base64_decode($_COOKIE['session']));
+        $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+
         $isDigital = array('tinyint','smallint','mediumint','int','bigint','float','double','decimal');
         $result = $con->query("SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='$db' AND TABLE_NAME='$tb' AND COLUMN_NAME='$column'");
         if($row = $result->fetch_assoc()) {
@@ -454,4 +536,177 @@ function CleanUpData($db, $tb, $column,$value) {
         $result->close();
         $con->close();
     }
+}
+
+function UpdateData($db,$tb,$beforeChange,$afterChange) {
+    $con_info = json_decode(base64_decode($_COOKIE['session']));
+    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+
+    $success = false;
+    $msg = '';
+    if($con->connect_errno)
+        $msg = $con->connect_error;
+    else {
+        if(!$con->select_db($db))
+            $msg = "不存在数据库$db";
+        else {
+            $result = $con->query("DESC $tb");
+            if ($con->errno)
+                $msg = $con->error;
+            else {
+                $columns = array();
+                while ($row = $result->fetch_assoc())
+                    array_push($columns, $row['Field']);
+                $arrBeforeChange = array();
+                foreach ($beforeChange as $index =>$value) {
+                    array_push($arrBeforeChange, CleanUpData($db, $tb, $columns[$index], $value));
+                }
+                $condition = '';
+                foreach ($columns as $index => $value)
+                    $condition .= $value.'='.$arrBeforeChange[$index].' and ';
+                $condition = substr($condition, 0, strlen($condition)-4);
+                $arrAfterChange = array();
+                foreach ($afterChange as $index=>$value) {
+                    array_push($arrAfterChange, CleanUpData($db, $tb, $columns[$index], $value));
+                }
+                $con->query('set autocommit=0');
+                $con->begin_transaction();
+                $updateSuccess = true;
+                foreach ($arrAfterChange as $index=>$value) {
+                    $sql = "UPDATE $tb SET ".$columns[$index].'='.$value." WHERE $condition";
+                    $con->query($sql);
+                    if($con->errno) {
+                        $updateSuccess = false;
+                        $msg .= $con->error;
+                        break;
+                    } else {
+                        $arrBeforeChange[$index] = $value;
+                        $condition = '';
+                        foreach ($columns as $i => $v)
+                            $condition .= $v.'='.$arrBeforeChange[$i].' and ';
+                        $condition = substr($condition, 0, strlen($condition)-4);
+                    }
+                }
+                if($updateSuccess) {
+                    $success = true;
+                    $msg = "数据更新成功！";
+                    $con->commit();
+                } else {
+                    $con->rollback();
+                }
+            }
+        }
+    }
+    $con->close();
+    return json_encode(array('success'=>$success,'msg'=>$msg));
+}
+//echo sql(array("SHOW DATABASES"));
+function Sql($sql) {
+    $con_info = json_decode(base64_decode($_COOKIE['session']));
+    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+    $success = false;
+    $msg = array();
+    $i = 0;
+    if($con->connect_errno)
+        $msg = $con->connect_error;
+    else
+        while(true){
+            if($i == count($sql))
+                break;
+            if(strlen(str_replace(" ","",$sql[$i])) == 0) {
+                $i ++;
+                continue;
+            }
+            $success = true;
+            $pushArray = "";
+            $tSql = $sql[$i];
+            $isTableResult = array("show","desc","describe","select");
+            $isMsgResult = array("insert",'update',"alter","start","begin");
+            $common = strtolower(array_values(array_filter(explode(' ',$tSql),"strlen"))[0]);
+
+            if(in_array($common,$isTableResult)) {
+                $startTime = microtime(true);
+                $result = $con->query("$tSql");
+                $costTime = microtime(true) - $startTime;
+                if($con->errno)
+                    $pushArray = SqlMsg($tSql,$costTime,"error",$con->error);
+                else {
+                    $pushArray = SqlTable($tSql,$result,$costTime);
+                }
+            } else {
+                 $con->query("$tSql");
+                if($con->errno)
+                    $pushArray = SqlMsg($tSql,0,"error",$con->error);
+            }
+            array_push($msg,$pushArray);
+            $i ++;
+        }
+    return json_encode(array('success'=>$success,'msg'=>$msg));
+}
+
+function SqlMsg($sql,$costTime,$type,$msg) {
+    if($type == "success")
+        $headBackgroundColor = "#c5ff8582";
+    else
+        $headBackgroundColor = "#ff858561";
+    $title = $sql;
+    if(strlen($sql) > 20)
+        $sql = substr($sql,0,20)."...";
+    return "<div class=\"block\" style=\"margin-top: 30px\"><div class=\"block-head\" style=\"background-color: $headBackgroundColor;\" title='$title'>$sql<span class='closeBlock' title='关闭' style='float: right;margin-left: 20px; margin-right: 10px'>X</span><span title='CostTime' style='float: right'>耗时: $costTime ms</span><div class=\"block-operate\"><a href=\"javascript:void(0)\" style=\"text-decoration: underline dotted;\" class=\"toggleBody\">收起&nbsp;↑</a></div></div><div class=\"block-body\">$msg</div></div>";
+}
+
+function SqlTable($sql,$result,$costTime) {
+
+    $columns = "";
+    foreach ($result->fetch_fields() as $columnName) {
+        $columns .= "<th>".$columnName->name."</th>";
+    }
+    $data = array();
+    while($row = $result->fetch_array(MYSQLI_NUM))
+        array_push($data,$row);
+    $data = json_encode($data);
+    $id = uniqid("table_");
+    $innerHtml = "<div class=\"block $id\" style=\"margin-top: 30px;\"><div class=\"block-head\" style=\"background-color:#c5ff8582\" title=\"$sql\">";
+    if(strlen($sql) > 20)
+        $innerHtml .= substr($sql,0,20)."...";
+    else
+        $innerHtml .= $sql;
+    $innerHtml .= "<span class='closeBlock' title='关闭' style='float: right;margin-left: 20px; margin-right: 10px'>X</span><span title='CostTime' style='float: right'>耗时: $costTime ms</span><div class=\"block-operate\"><a href=\"javascript:void(0)\" style=\"text-decoration: underline dotted;\" class=\"toggleBody\">收起&nbsp;↑</a></div></div>";
+    $innerHtml .= /** @lang text */
+    <<<EOF
+<div class="block-body">
+    <div>
+        <table id="$id" class="display nowrap" width="100%">
+            <thead>
+                <tr>
+                    $columns
+                </tr>
+        </thead>
+        </table>
+            </div>
+            </div></div>
+            <script>
+            $(document).ready(function () {
+                let data = $data;
+                var table = $('#$id').DataTable({
+                    data: data,
+                    "scrollX": true,
+                    "info": false,
+                    "aaSorting": [],
+                    "language": {
+                        "zeroRecords":    "未匹配到任何结果",
+                        "emptyTable": "无任何结果!",
+                        "paginate": {
+                            "first":      "首页",
+                            "last":       "末页",
+                            "next":       "下一页",
+                            "previous":   "上一页"
+                        },
+                        "lengthMenu":     "显示 _MENU_ 项 ",
+                    },
+                });
+            });
+        </script>
+EOF;
+    return $innerHtml;
 }

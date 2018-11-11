@@ -4,19 +4,28 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<title>Login-FunnySQL</title>
-	<link rel="shortcut icon" href="<?php echo $domain.$path;?>res/favicon.png">
-    <link href="https://fonts.googleapis.com/css?family=Spicy+Rice" rel="stylesheet">
+	<title><?php echo $PAGE_TITLE_LOGIN;?></title>
+	<link rel="shortcut icon" href="<?php echo $PAGE_ICON;?>">
+    <link rel="stylesheet" href="<?php echo $PATH;?>lib/google-fonts/spicyrice/css.css">
 
 </head>
-<?php  unset($_COOKIE['funnysql']); setcookie('funnysql',null,-1,$path)?>
+<?php  unset($_COOKIE['session']); setcookie('session',null,-1,$PATH)?>
 <style>
+    @keyframes fadeInUp{
+        0%{
+            opacity:0;
+            transform:translateY(20px)
+        }
+        100%{
+            opacity:1;
+            transform:translateY(0)
+        }
+    }
     *{
         box-sizing:border-box
     }
     body{
-        background:url("<?php echo $domain.$path;
-    ?>res/bgImage.jpg") no-repeat fixed center ;
+        background:url("<?php echo $PATH;?>res/bgImage.jpg") no-repeat fixed center ;
         background-size:cover;
         width:100%
     }
@@ -28,22 +37,23 @@
         bottom:0;
         right:0;
         height:500px;
-        text-align:center
+        text-align:center;
     }
     a{
         text-decoration:none;
-        color:black
+        color:black;
     }
     header{
         width:100%;
         text-align:center;
         font-size:65px;
-        font-family: 'Spicy Rice', cursive;;
-        margin-bottom:90px
+        font-family: 'Spicy Rice', cursive;
+        margin-bottom:90px;
     }
     form{
         max-width:360px;
-        margin:0 auto
+        margin:0 auto;
+
     }
     .input{
         width:100%;
@@ -102,23 +112,14 @@
         animation-name:fadeInUp;
         animation-duration:1s;
     }
-    @keyframes fadeInUp{
-        0%{
-            opacity:0;
-            transform:translateY(20px)
-        }
-        100%{
-            opacity:1;
-            transform:translateY(0)
-        }
-    }
+
 
 
 </style>
 <body>
     <div id="msg"><span id="msg-body"></span><span id="msg-close" style="cursor: pointer;">X</span></div>
 	<div class="main">
-		<header class="header"><a href="<?php echo $domain.$path; ?>">FunnySQL</a></header>
+		<header class="header"><a href="<?php echo $PATH; ?>"><?php echo $NAME;?></a></header>
 		<form onsubmit="return false">
 			<input type="text" name="host" placeholder="IP地址" class="input">
 			<input type="number" name="port" placeholder="端口" value="3306" class="input">
@@ -127,7 +128,7 @@
 			<input type="submit" class="submit" value="连接">
 		</form>
 	</div>
-	<script src="<?php echo $path?>lib/jquery.min.js"></script>
+	<script src="<?php echo $PATH?>lib/jquery.min.js"></script>
 	<script>
 		$(document).ready(function(){
             function showMsg(Message, type) {
@@ -186,7 +187,7 @@
                                         data: {'type': '1','host':host,'port':port,'userName':userName,'password':password},
                                         success:function(data){
                                             if(data.success) {
-                                                window.location.href = "<?php echo $path;?>";
+                                                window.location.href = "<?php echo $PATH;?>";
                                             } else {
                                                 showMsg(data.msg);
                                             }

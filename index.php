@@ -1,9 +1,10 @@
 <?php
+error_reporting(0);
 include('./lib/settings.php');
-if(!array_key_exists('funnysql', $_COOKIE))
-    header("Location: ".$domain .$path."login");
-$con_info = explode(',', $_COOKIE['funnysql']);
-$con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
+if(!array_key_exists('session', $_COOKIE))
+    header("Location: ".$PATH."login");
+$con_info = json_decode(base64_decode($_COOKIE['session']));
+$con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
 ?>
 <!doctype html>
 <html style="height: 100%;">
@@ -12,11 +13,11 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>概述 - FunnySQL</title>
-    <link rel="shortcut icon" href="<?php echo $path;?>res/favicon.png">
-    <link rel="stylesheet" href="<?php echo $path?>lib/jquery-ui/jquery-ui.min.css">
-    <link rel="stylesheet" href="https://cdn.bootcss.com/jstree/3.3.5/themes/default/style.min.css">
-    <link rel="stylesheet" href="<?php echo $path;?>lib/css.css">
+    <title><?php echo $PAGE_TITLE_HOME;?></title>
+    <link rel="shortcut icon" href="<?php echo $PAGE_ICON;?>">
+    <link rel="stylesheet" href="<?php echo $PATH?>lib/jquery-ui/jquery-ui.min.css">
+    <link rel="stylesheet" href="<?php echo $PATH?>lib/jstree/3.3.5/themes/default/style.min.css">
+    <link rel="stylesheet" href="<?php echo $PATH;?>lib/css.css">
 </head>
 <style>
 
@@ -26,38 +27,81 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
 </style>
 <body>
 <div id="msg"><span id="msg-body"></span><span id="msg-close" style="cursor: pointer;">X</span></div>
-<div id="loader"></div>
+<div id="loader">
+</div>
 <div id="fullScreen"></div>
 <div id="close"><div class="close-head">确定离开？<a >X</a ></div><div class="close-body">
         <button>确定</button>
         <button>取消</button></div></div>
 <div class="head">
-    <a href="<?php echo $path?>" id="nav-home">
-        <img src="<?php echo $path?>res/mysql.png"  class="icon home" width="18px" height="18px">&nbsp;概述</a>
-    <a href="<?php echo $path?>database" id="nav-database">
-        <img src="<?php echo $path?>res/database.png"  class="icon database" width="18px" height="18px">&nbsp;数据库</a>
-    <a href="<?php echo $path?>new-delete-table" id="nav-table">
-        <img src="<?php echo $path?>res/table.png"  class="icon table" width="18px" height="18px">&nbsp;数据表
+    <a href="<?php echo $PATH?>" id="nav-home" class="active">
+        <img src="<?php echo $PATH?>res/mysql_active.png"  class="icon home" >
+        &nbsp;概述
     </a>
-    <a href="javascript:void(0)" id="sql">&nbsp;SQL</a>
-    <a href="#" id="exit">X</a>
+    <a href="<?php echo $PATH?>database" id="nav-database">
+        <img src="<?php echo $PATH?>res/database.png"  class="icon database icon-inactive" >
+        <img src="<?php echo $PATH?>res/database_active.png"  class="icon database icon-active">
+        &nbsp;数据库
+    </a>
+    <a href="<?php echo $PATH?>new-delete-table" id="nav-table">
+        <img src="<?php echo $PATH?>res/table.png"  class="icon table icon-inactive">
+        <img src="<?php echo $PATH?>res/table_active.png"  class="icon table icon-active">
+        &nbsp;数据表
+    </a>
+    <a href="<?php echo $PATH."sql"?>" id="nav-sql">
+        <img src="<?php echo $PATH?>res/sql.png"  class="icon sql icon-inactive" >
+        <img src="<?php echo $PATH?>res/sql_active.png"  class="icon sql icon-active">
+        &nbsp;SQL
+    </a>
+    <a href="javascript:void(0)" id="exit">X</a>
 </div>
 <div class="main">
     <div class="left">
         <div class="block">
             <div class="block-head">数据库信息</div>
-            <div class="block-body" style="text-align: left">
-                <ul>
-                    <li>连接：&nbsp;&nbsp;<?php echo mysqli_get_host_info($con);?></li>
-                    <li>Mysql 版本：&nbsp;&nbsp;<?php echo mysqli_get_server_info($con)?></li>
-                    <li>协议版本：&nbsp;&nbsp;<?php echo $con->protocol_version;?></li>
-                    <li>当前用户：&nbsp;&nbsp;<?php
-                        if($result = $con->query('SELECT USER()')) {
-                            echo mysqli_fetch_array($result)['USER()'];
-                        }
-                        $result->free_result();
-                        ?></li>
-                    <br/>
+            <div class="block-body" style="text-align: left; margin-left: 16px;">
+                <table>
+                    <tbody>
+                    <tr>
+                        <td>连接：</td>
+                        <td><?php echo mysqli_get_host_info($con);?></td>
+                    </tr>
+                    <tr>
+                        <td>Mysql 版本：</td>
+                        <td><?php echo mysqli_get_server_info($con)?></td>
+                    </tr>
+                    <tr>
+                        <td>协议版本：</td>
+                        <td><?php echo $con->protocol_version;?></td>
+                    </tr>
+                    <tr>
+                        <td>当前用户：</td>
+                        <td><?php
+                            if($result = $con->query('SELECT USER()')) {
+                                echo mysqli_fetch_array($result)['USER()'];
+                            }
+                            $result->free_result();
+                            ?></td>
+                    </tr>
+                    <tr>
+                        <td>Mysql 安装路径：</td>
+                        <td>
+                            <?php
+                            if($row = $con->query("select @@basedir as basePath from dual;")->fetch_array(MYSQLI_NUM))
+                                echo $row[0];
+                            ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Mysql 数据文件路径：</td>
+                        <td>
+                            <?php
+                            if($row = $con->query("show global variables like \"%datadir%\";")->fetch_assoc())
+                                echo $row["Value"];
+                            ?>
+                        </td>
+                    </tr>
+                    <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
                     <?php
                     $result = $con->query(' SHOW VARIABLES LIKE  \'char%\';');
                     $tempName = array('客户端默认字符集：','连接默认字符集：','数据库默认字符集：','文件系统默认字符集：','结果集默认字符集：','服务器默认字符集：','系统默认字符集：');
@@ -65,17 +109,24 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
                     while($row = $result->fetch_assoc()) {
                         if($tempIndex == 7)
                             break;
-                        echo '<li>'.$tempName[$tempIndex].'&nbsp;&nbsp;'.$row['Value'].'</li>';
+                        echo '<tr><td>'.$tempName[$tempIndex].'</td><td>'.$row['Value'].'</td><tr>';
                         $tempIndex ++;
                     }
                     $result->free_result();
                     ?>
-                </ul></div>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+        <div class="block" style="margin-top: 30px;">
+            <div class="block-head">团队信息</div>
+            <div class="block-body"></div>
         </div>
     </div>
     <div class="right">
         <div class="block">
-            <div class="block-head">数据库树状图<img id="refresh" src="<?php echo $path?>res/refresh.png" width="16px" height="16px" title="刷新"/></div>
+            <div class="block-head">数据库树状图<img id="refresh" src="<?php echo $PATH?>res/refresh.png" width="16px" height="16px" title="刷新"/></div>
             <div class="block-body"  style="text-align: left">
                 <div id="tree"></div>
             </div>
@@ -83,63 +134,27 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
 
     </div>
 </div>
-<script src="<?php echo $path?>lib/jquery.min.js"></script>
-<script src="<?php echo $path?>lib/jquery-ui/jquery-ui.js"></script>
-<script src="<?php echo $path?>lib/jquery/jquery.cookie.min.js"></script>
-<script src="https://cdn.bootcss.com/jstree/3.3.5/jstree.min.js"></script>
-<script src="<?php echo $path?>lib/js.js"></script>
+<script src="<?php echo $PATH?>lib/jquery.min.js"></script>
+<script src="<?php echo $PATH?>lib/jquery-ui/jquery-ui.js"></script>
+<script src="<?php echo $PATH?>lib/jquery/jquery.cookie.min.js"></script>
+<script src="<?php echo $PATH?>lib/jstree/3.3.5/jstree.min.js"></script>
+<script src="<?php echo $PATH?>lib/js.js"></script>
 <script>
 
     $(document).ready(function(){
-        /* Other Start */
-        $('#nav-home').addClass('active');
-        /* Other End */
-
-        /* Common Part Start*/
-        function showLoader() {
-            $('#loader').show();
-        }
-        function hideLoader() {
-            $('#loader').hide();
-        }
-        function showMsg(Message, type) {
-            let color = 'red';
-            if(type === undefined || type === 'error')
-                color = "red";
-            else if (type === 'success')
-                color = "#00ff2b";
-            if(Message != null) {
-                $("#msg").css('background',color).addClass("msgShow").find('#msg-body').text(Message).parent('#msg').show();
-                setTimeout(function(){
-                    $("#msg").removeClass("msgShow").find('#msg-body').text('').parent('#msg').hide();
-                }, 3333)
-            }
-        }
-        $("#msg-close").click(function () {
-            $("#msg").removeClass("msgShow").hide().find('#msg-body').text('');
-        });
-        $("#exit").click(function () {
-            $("#close, #fullScreen").show();
-        });
-        $('.close-head a, .close-body button:last-child').click(function () {
-            $("#close, #fullScreen").hide();
-        });
-        $("#close").draggable();
         $('.close-body button:first-child').click(function () {
             $.ajax({
-                url: '<?php echo $path;?>lib/Processing.php',
+                url: '<?php echo $PATH;?>lib/Processing.php',
                 method: 'post',
                 data: {'type': '2'},
                 success: function () {
-                    window.location.href = '<?php echo $path;?>';
+                    window.location.href = '<?php echo $PATH;?>';
                 }
             });
         });
         $('#refresh').click(function () {
             loadTree();
         });
-        /* Common Part End */
-
         $("#tree").jstree({
             "plugins" : [
                 "sort",
@@ -158,12 +173,12 @@ $con = new mysqli($con_info[0],$con_info[2], $con_info[3],'',$con_info[1]);
                 let parent = $(this).jstree().get_node(node.parents[0]);
                 let db = parent.text;
                 let tb = node.text;
-                window.location.href = '<?php echo $path;?>view-edit-table?db='+ db + '&tb=' + tb;
+                window.location.href = '<?php echo $PATH;?>view-edit-table?db='+ db + '&tb=' + tb;
             }
         });
         function loadTree(){
             $.ajax({
-                url: '<?php echo $path; ?>lib/api/GetDatabasesTreeView.php',
+                url: '<?php echo $PATH; ?>lib/api/GetDatabasesTreeView.php',
                 dataType: 'json',
                 beforeSend: function() {
                     showLoader();
