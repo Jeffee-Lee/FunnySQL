@@ -119,10 +119,7 @@ $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$c
 
             </div>
         </div>
-        <div class="block" style="margin-top: 30px;">
-            <div class="block-head">团队信息</div>
-            <div class="block-body"></div>
-        </div>
+        
     </div>
     <div class="right">
         <div class="block">

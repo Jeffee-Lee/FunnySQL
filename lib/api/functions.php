@@ -129,7 +129,6 @@ function GetDatabaseDetail($databaseName) {
     $success = false;
     $msg = null;
     $data = array();
-    global $PATH;
 
     $colHeaders = array('','表名','记录数');
     $columns = array(array('type'=>'text','className'=>'htCenter htMiddle','width'=>20, 'renderer'=>'html'),array('type'=>'text','className'=>'htCenter htMiddle', 'width'=>100, 'renderer'=>'html'),array('type'=>'text','className'=>'htCenter htMiddle', 'width'=>25));
@@ -158,7 +157,7 @@ function GetDatabaseDetail($databaseName) {
                     else {
                         $success = true;
                         if ($row = $result->fetch_assoc())
-                            array_push($data, array('<a href="javascript:void(0)" class="delete-table delete" tb="'.$value.'">删除</a>','<a href="'.$PATH.'view-edit-table?db='.$databaseName.'&tb='.$value.'" class="access " title="访问数据表 '.$value.'">'.$value.'</a>', $row['COUNT(*)']));
+                            array_push($data, array('<a href="javascript:void(0)" class="delete-table delete" tb="'.$value.'">删除</a>','<a href="./view-edit-table?db='.$databaseName.'&tb='.$value.'" class="access " title="访问数据表 '.$value.'">'.$value.'</a>', $row['COUNT(*)']));
                     }
                 }
         }
@@ -326,7 +325,6 @@ function GetDatabases() {
     $msg = '';
     $data = array();
     $dbList = "";
-    global $PATH;
     if($con->connect_errno)
         $msg = $con->connect_error;
     else {
@@ -338,7 +336,7 @@ function GetDatabases() {
             $success = true;
             while($row = $result->fetch_assoc()) {
                 $dbList .= "<option value='{$row['SCHEMA_NAME']}'>{$row['SCHEMA_NAME']}</option>";
-                array_push($data, array('<a href="javascript:void(0)" class="deleteDatabase delete" db="'.$row['SCHEMA_NAME'].'">删除</a>',"<a href='".$PATH."new-delete-table?db=".$row['SCHEMA_NAME']."' title='访问数据库 ".$row['SCHEMA_NAME']."' class='access'>".$row['SCHEMA_NAME']."</a>",$row['DEFAULT_COLLATION_NAME']));
+                array_push($data, array('<a href="javascript:void(0)" class="deleteDatabase delete" db="'.$row['SCHEMA_NAME'].'">删除</a>',"<a href='./new-delete-table?db=".$row['SCHEMA_NAME']."' title='访问数据库 ".$row['SCHEMA_NAME']."' class='access'>".$row['SCHEMA_NAME']."</a>",$row['DEFAULT_COLLATION_NAME']));
             }
         }
     }

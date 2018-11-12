@@ -333,7 +333,7 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
                                 let tb = $(this).attr('tb');
                                 if(confirm('确定删除数据表'+ tb)) {
                                     $.ajax({
-                                        url: '。/lib/Processing.php?type=4&db='+db+'&tb='+tb,
+                                        url: './lib/Processing.php?type=4&db='+db+'&tb='+tb,
                                         dataType: 'json',
                                         timeout: 3000,
                                         success: function (data) {

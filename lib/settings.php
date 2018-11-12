@@ -1,8 +1,6 @@
 <?php
 error_reporting(0);
 
-// 客户端文件的路径
-//$PATH = '/funnysql/';
 
 // 客户端的名称
 $NAME = "FunnySQL";
