@@ -407,7 +407,6 @@ function AlterDatabase($db,$collation) {
 /* POST 请求处理函数 */
 // login页面根据用户输入设置连接
 function SetConnect($host,$port,$userName,$password) {
-    global $PATH;
 
     function isGetAvailable($name) {
         return isset($_POST[$name]) && !empty($_POST[$name]);
@@ -424,7 +423,7 @@ function SetConnect($host,$port,$userName,$password) {
         if($con->connect_errno)
             $msg = $con->connect_error;
         else {
-            setcookie('session',base64_encode(json_encode(array('host'=>$host,"port"=>$port,"userName"=>$userName,"password"=>$password))),time() + 60*60*24, $PATH);
+            setcookie('session',base64_encode(json_encode(array('host'=>$host,"port"=>$port,"userName"=>$userName,"password"=>$password))),time() + 60*60*24, "/");
             $success = true;
             $msg = "连接成功！";
         }
@@ -435,8 +434,7 @@ function SetConnect($host,$port,$userName,$password) {
 }
 // 移除连接
 function RemoveConnect(){
-    global $PATH;
-    setcookie('session','',time()-60*60*24,$PATH);
+    setcookie('session','',time()-60*60*24,"/");
 }
 
 /**

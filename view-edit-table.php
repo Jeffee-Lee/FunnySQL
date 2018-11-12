@@ -1,7 +1,7 @@
 <?php
 include('./lib/settings.php');
 if(!array_key_exists('session', $_COOKIE))
-    header("Location: ".$PATH."login");
+    header("Location: ,/login");
 $con_info = json_decode(base64_decode($_COOKIE['session']));
 $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
 
@@ -46,14 +46,14 @@ if(isset($_GET['p']) and !empty($_GET['p']))
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title><?php echo $PAGE_TITLE_TABLE;?></title>
     <link rel="shortcut icon" href="<?php echo $PAGE_ICON;?>">
-    <link rel="stylesheet" href="<?php echo $PATH?>lib/jquery-ui/jquery-ui.min.css">
-    <link rel="stylesheet" href="<?php echo $PATH?>lib/handsontable/handsontable.full.min.css">
-    <link rel="stylesheet" href="<?php echo $PATH?>lib/css.css">
+    <link rel="stylesheet" href="./lib/jquery-ui/jquery-ui.min.css">
+    <link rel="stylesheet" href="./lib/handsontable/handsontable.full.min.css">
+    <link rel="stylesheet" href="./lib/css.css">
 </head>
 <style>
     .pageSkip {
         display: inline-block;
-        background: transparent url('<?php echo $PATH.'res/arrow-left.png';?>') no-repeat -10px -10px;
+        background: transparent url('./res/arrow-left.png') no-repeat -10px -10px;
         text-indent: -999em;
         background-size: 40px;
         opacity: 0.7;
@@ -62,7 +62,7 @@ if(isset($_GET['p']) and !empty($_GET['p']))
         height: 20px;
     }
     .pageNext {
-        background-image: url('<?php echo $PATH.'res/arrow-right.png';?>');
+        background-image: url('./res/arrow-right.png');
     }
     .changPage {
         margin-top: 10px;
@@ -80,23 +80,23 @@ if(isset($_GET['p']) and !empty($_GET['p']))
         <button>确定</button>
         <button>取消</button></div></div>
 <div class="head">
-    <a href="<?php echo $PATH?>" id="nav-home">
-        <img src="<?php echo $PATH?>res/mysql.png"  class="icon home icon-inactive">
-        <img src="<?php echo $PATH?>res/mysql_active.png"  class="icon home icon-active">
+    <a href="./" id="nav-home">
+        <img src="./res/mysql.png"  class="icon home icon-inactive">
+        <img src="./res/mysql_active.png"  class="icon home icon-active">
         &nbsp;概述
     </a>
-    <a href="<?php echo $PATH?>database" id="nav-database">
-        <img src="<?php echo $PATH?>res/database.png"  class="icon database icon-inactive" >
-        <img src="<?php echo $PATH?>res/database_active.png"  class="icon database icon-active">
+    <a href="./database" id="nav-database">
+        <img src="./res/database.png"  class="icon database icon-inactive" >
+        <img src="./res/database_active.png"  class="icon database icon-active">
         &nbsp;数据库
     </a>
-    <a href="<?php echo $PATH?>new-delete-table" id="nav-table" class="active">
-        <img src="<?php echo $PATH?>res/table_active.png"  class="icon table">
+    <a href="./new-delete-table" id="nav-table" class="active">
+        <img src="./res/table_active.png"  class="icon table">
         &nbsp;数据表
     </a>
-    <a href="<?php echo $PATH."sql"?>" id="nav-sql">
-        <img src="<?php echo $PATH?>res/sql.png"  class="icon sql icon-inactive" >
-        <img src="<?php echo $PATH?>res/sql_active.png"  class="icon sql icon-active">
+    <a href="./sql" id="nav-sql">
+        <img src="./res/sql.png"  class="icon sql icon-inactive" >
+        <img src="./res/sql_active.png"  class="icon sql icon-active">
         &nbsp;SQL
     </a>
     <a href="javascript:void(0)" id="exit">X</a>
@@ -104,8 +104,8 @@ if(isset($_GET['p']) and !empty($_GET['p']))
 
 <div class="more" id="more">&nbsp;&nbsp;更多操作&nbsp;&nbsp;</div>
 <div class="more" id="more-info">
-    <a href="<?php echo $PATH;?>new-delete-table" id="newDelete" class="subMore"> 新建/删除 </a>
-    <a href="<?php echo $PATH;?>view-edit-table" id="viewEdit"  class="subMore"> 查看/编辑 </a>
+    <a href="./new-delete-table" id="newDelete" class="subMore"> 新建/删除 </a>
+    <a href="./view-edit-table" id="viewEdit"  class="subMore"> 查看/编辑 </a>
 </div>
 
 <div class="block" id="popUpEdit" style="display: none;">
@@ -197,11 +197,11 @@ if(isset($_GET['p']) and !empty($_GET['p']))
 
 
 </div>
-<script src="<?php echo $PATH?>lib/jquery.min.js"></script>
-<script src="<?php echo $PATH?>lib/jquery-ui/jquery-ui.js"></script>
-<script src="<?php echo $PATH?>lib/jquery/jquery.cookie.min.js"></script>
-<script src="<?php echo $PATH?>lib/handsontable/handsontable.full.min.js"></script>
-<script src="<?php echo $PATH?>lib/js.js"></script>
+<script src="./lib/jquery.min.js"></script>
+<script src="./lib/jquery-ui/jquery-ui.js"></script>
+<script src="./lib/jquery/jquery.cookie.min.js"></script>
+<script src="./lib/handsontable/handsontable.full.min.js"></script>
+<script src="./lib/js.js"></script>
 <script>
 
     $(document).ready(function() {
@@ -219,11 +219,11 @@ if(isset($_GET['p']) and !empty($_GET['p']))
         /* Common Part Start */
         $('.close-body button:first-child').click(function () {
             $.ajax({
-                url: '<?php echo $PATH;?>lib/Processing.php',
+                url: './lib/Processing.php',
                 method: 'post',
                 data: {'type': '2'},
                 success: function () {
-                    window.location.href = '<?php echo $PATH;?>';
+                    window.location.href = './';
                 }
             });
         });
@@ -260,7 +260,7 @@ if(isset($_GET['p']) and !empty($_GET['p']))
             if(db === undefined)
                 db = '<?php echo $dba;?>';
             $.ajax({
-                url: '<?php echo $PATH.'lib/Processing.php?type=6&db=';?>'+db,
+                url: './lib/Processing.php?type=6&db='+db,
                 dataType: 'json',
                 timeout: 3000,
                 success: function (data) {
@@ -314,7 +314,7 @@ if(isset($_GET['p']) and !empty($_GET['p']))
                 showMsg('啥都没填，就别提交了！');
             else {
                 $.ajax({
-                    url : '<?php echo $PATH?>lib/Processing',
+                    url : './lib/Processing',
                     method: 'post',
                     dataType: 'json',
                     timeout: 3000,
@@ -354,7 +354,7 @@ if(isset($_GET['p']) and !empty($_GET['p']))
             if(page === undefined)
                 page = '<?php echo $page;?>';
             $.ajax({
-                url: '<?php echo $PATH."lib/Processing.php?type=7&db=";?>'+db + '&tb=' + tb + '&p='+ page,
+                url: './lib/Processing.php?type=7&db='+db + '&tb=' + tb + '&p='+ page,
                 dataType: 'json',
                 beforeSend: function(){
                     showLoader();
@@ -385,9 +385,9 @@ if(isset($_GET['p']) and !empty($_GET['p']))
                         updateIndexColumnsFromArray(colHeaders);
                         originalDb = db;
                         originalTb = tb;
-                        window.history.replaceState({},'','<?php echo $PATH.basename(__FILE__,'.php');?>?p='+currentPage+'&db='+db + '&tb='+tb);
+                        window.history.replaceState({},'','./view-edit-table?p='+currentPage+'&db='+db + '&tb='+tb);
                         $('#pageInfo').html(currentPage + '/' + totalPage);
-                        $('#blockRight1-head').html(tb + "<img id=\"refresh\" src=\"<?php echo $PATH?>res/refresh.png\" title=\"刷新\"/>");
+                        $('#blockRight1-head').html(tb + "<img id=\"refresh\" src=\"./res/refresh.png\" title=\"刷新\"/>");
                         $('#refresh').click(function () {
                             loadDataTable(originalDb,originalTb, 1);
                         });
@@ -402,7 +402,7 @@ if(isset($_GET['p']) and !empty($_GET['p']))
                                 i ++;
                             }
                             $.ajax({
-                                url: '<?php echo $PATH."lib/Processing.php?type=8&db=";?>'+db + '&tb=' + tb + '&p='+ page + '&condition='+ condition,
+                                url: './lib/Processing.php?type=8&db='+db + '&tb=' + tb + '&p='+ page + '&condition='+ condition,
                                 dataType : 'json',
                                 timeout: 3000,
                                 success: function (data) {
@@ -456,7 +456,7 @@ if(isset($_GET['p']) and !empty($_GET['p']))
                 alert('没修改');
             else {
                 $.ajax({
-                    url: '<?php echo $PATH."lib/Processing.php"?>',
+                    url: './lib/Processing.php',
                     method: 'post',
                     data: {'type':'4','db':originalDb,'tb':originalTb,'beforeChange':beforeChange,'afterChange':afterChange},
                     dataType: 'json',
@@ -539,7 +539,7 @@ if(isset($_GET['p']) and !empty($_GET['p']))
            else {
                if(confirm("确定在表 "+originalTb +' 上的列 '+ indexColumn+' 添加' + typeName[parseInt(indexType)] + ': '+indexName)) {
                    $.ajax({
-                       url: '<?php echo $PATH."lib/Processing.php?type=10&db=";?>'+originalDb + '&tb=' + originalTb + '&col='+ indexColumn + '&indexType='+ indexType + '&name=' + indexName,
+                       url: './lib/Processing.php?type=10&db="'+originalDb + '&tb=' + originalTb + '&col='+ indexColumn + '&indexType='+ indexType + '&name=' + indexName,
                        dataType: 'json',
                        timeout: 3000,
                        success: function (data) {

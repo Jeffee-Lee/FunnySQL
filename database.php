@@ -1,7 +1,7 @@
 <?php
 include('./lib/settings.php');
 if(!array_key_exists('session', $_COOKIE))
-    header("Location: ".$PATH."login");
+    header("Location: ./login");
 $con_info = json_decode(base64_decode($_COOKIE['session']));
 $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
 ?>
@@ -14,9 +14,9 @@ $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$c
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title><?php echo $PAGE_TITLE_DATABASE;?></title>
     <link rel="shortcut icon" href="<?php echo $PAGE_ICON;?>">
-    <link rel="stylesheet" href="<?php echo $PATH?>lib/jquery-ui/jquery-ui.min.css">
-    <link rel="stylesheet" href="<?php echo $PATH?>lib/handsontable/handsontable.full.min.css">
-    <link rel="stylesheet" href="<?php echo $PATH?>lib/css.css">
+    <link rel="stylesheet" href=./lib/jquery-ui/jquery-ui.min.css">
+    <link rel="stylesheet" href="./lib/handsontable/handsontable.full.min.css">
+    <link rel="stylesheet" href="./lib/css.css">
 
 </head>
 <style>
@@ -35,23 +35,23 @@ $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$c
         <button>确定</button>
         <button>取消</button></div></div>
 <div class="head">
-    <a href="<?php echo $PATH?>" id="nav-home">
-        <img src="<?php echo $PATH?>res/mysql.png"  class="icon home icon-inactive">
-        <img src="<?php echo $PATH?>res/mysql_active.png"  class="icon home icon-active">
+    <a href="./" id="nav-home">
+        <img src="./res/mysql.png"  class="icon home icon-inactive">
+        <img src="./res/mysql_active.png"  class="icon home icon-active">
         &nbsp;概述
     </a>
-    <a href="<?php echo $PATH?>database" id="nav-database" class="active">
-        <img src="<?php echo $PATH?>res/database_active.png"  class="icon database">
+    <a href="./database" id="nav-database" class="active">
+        <img src="./res/database_active.png"  class="icon database">
         &nbsp;数据库
     </a>
-    <a href="<?php echo $PATH?>new-delete-table" id="nav-table">
-        <img src="<?php echo $PATH?>res/table.png"  class="icon table icon-inactive">
-        <img src="<?php echo $PATH?>res/table_active.png"  class="icon table icon-active">
+    <a href="./new-delete-table" id="nav-table">
+        <img src="./res/table.png"  class="icon table icon-inactive">
+        <img src="./res/table_active.png"  class="icon table icon-active">
         &nbsp;数据表
     </a>
-    <a href="<?php echo $PATH."sql"?>" id="nav-sql">
-        <img src="<?php echo $PATH?>res/sql.png"  class="icon sql icon-inactive" >
-        <img src="<?php echo $PATH?>res/sql_active.png"  class="icon sql icon-active">
+    <a href="./sql" id="nav-sql">
+        <img src="./res/sql.png"  class="icon sql icon-inactive" >
+        <img src="./res/sql_active.png"  class="icon sql icon-active">
         &nbsp;SQL
     </a>
     <a href="javascript:void(0)" id="exit">X</a>
@@ -129,7 +129,7 @@ $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$c
     </div>
     <div class="right" >
         <div class="block">
-            <div class=" block-head">删除数据库<img id="refresh" src="<?php echo $PATH?>res/refresh.png" width="16px" height="16px" title="刷新"/></div>
+            <div class=" block-head">删除数据库<img id="refresh" src="./res/refresh.png" width="16px" height="16px" title="刷新"/></div>
             <div class="block-body">
                 <div id="databaseTable"></div>
             </div>
@@ -137,11 +137,11 @@ $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$c
 
 
     </div>
-<script src="<?php echo $PATH?>lib/jquery.min.js"></script>
-<script src="<?php echo $PATH?>lib/jquery-ui/jquery-ui.js"></script>
-<script src="<?php echo $PATH?>lib/jquery/jquery.cookie.min.js"></script>
-<script src="<?php echo $PATH?>lib/handsontable/handsontable.full.min.js"></script>
-<script src="<?php echo $PATH?>lib/js.js"></script>
+<script src="./lib/jquery.min.js"></script>
+<script src="./lib/jquery-ui/jquery-ui.js"></script>
+<script src="./lib/jquery/jquery.cookie.min.js"></script>
+<script src="./lib/handsontable/handsontable.full.min.js"></script>
+<script src="./lib/js.js"></script>
 
 <script>
 
@@ -149,11 +149,11 @@ $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$c
         /* Common Part Start */
         $('.close-body button:first-child').click(function () {
             $.ajax({
-                url: '<?php echo $PATH;?>lib/Processing.php',
+                url: './lib/Processing.php',
                 method: 'post',
                 data: {'type': '2'},
                 success: function () {
-                    window.location.href = '<?php echo $PATH;?>';
+                    window.location.href = './';
                 }
             });
         });
@@ -166,7 +166,7 @@ $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$c
             let charset = $('select[name="db_collation"]').val();
             if(name !== '') {
                 $.ajax({
-                    url: '<?php echo $PATH;?>lib/Processing.php?type=1&databaseName=' + name + '&collationName=' + charset,
+                    url: './lib/Processing.php?type=1&databaseName=' + name + '&collationName=' + charset,
                     dataType: 'json',
                     timeout: 3000,
                     success: function (data) {
@@ -187,7 +187,7 @@ $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$c
            let db =  $("select[name='dbList']").val();
            let collation = $('select[name="change_db_collation"]').val();
            $.ajax({
-               url: '<?php echo $PATH;?>lib/Processing.php?type=11&db=' + db + '&collation=' + collation,
+               url: './lib/Processing.php?type=11&db=' + db + '&collation=' + collation,
                dataType: 'json',
                timeout: 3000,
                success: function (data) {
@@ -205,7 +205,7 @@ $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$c
         });
         $("#backup").click(function () {
             let db = $("select[name='backup_db']").val();
-            window.location = '<?php echo $PATH;?>lib/api/backupDb.php?db=' + db;
+            window.location = './lib/api/backupDb.php?db=' + db;
         });
         let hot = new Handsontable(document.getElementById('databaseTable'), {
             fillHandle: false,
@@ -240,7 +240,7 @@ $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$c
                 let db = $(this).attr('db');
                 if(confirm('确定删除数据库'+ db + '吗？'))
                     $.ajax({
-                        url: '<?php echo $PATH."lib/Processing.php?type=2&db=";?>' + db,
+                        url: './lib/Processing.php?type=2&db=' + db,
                         dataType: 'json',
                         timeout: 3000,
                         success: function (data) {
@@ -258,7 +258,7 @@ $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$c
         }
         function loadDatabases(){
             $.ajax({
-                url: '<?php echo $PATH."lib/Processing.php?type=9";?>',
+                url: './lib/Processing.php?type=9',
                 dataType: 'json',
                 timeout: 3000,
                 beforeSend: function() {

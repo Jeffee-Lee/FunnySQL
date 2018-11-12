@@ -1,7 +1,7 @@
 <?php
 include('./lib/settings.php');
 if(!array_key_exists('session', $_COOKIE))
-    header("Location: ".$domain .$PATH."login");
+    header("Location: ./login");
 $con_info = json_decode(base64_decode($_COOKIE['session']));
 $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
 
@@ -15,16 +15,16 @@ $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$c
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title><?php echo $PAGE_TITLE_SQL;?></title>
         <link rel="shortcut icon" href="<?php echo $PAGE_ICON;?>">
-        <link rel="stylesheet" href="<?php echo $PATH?>lib/jquery-ui/jquery-ui.min.css">
-        <link rel="stylesheet" href="<?php echo $PATH?>lib/codemirror/5.41.0/codemirror.min.css">
-        <link rel="stylesheet" href="<?php echo $PATH?>lib/codemirror/5.41.0/addon/hint/show-hint.min.css">
-        <link rel="stylesheet" href="<?php echo $PATH?>lib/codemirror/5.41.0/theme/3024-day.min.css">
-        <link rel="stylesheet" href="<?php echo $PATH?>lib/font-awesome/4.7.0/css/font-awesome.min.css">
-        <link rel="stylesheet" href="<?php echo $PATH?>lib/datatables/1.10.19/css/jquery.dataTables.min.css">
-        <link rel="stylesheet" href="<?php echo $PATH?>lib/css.css">
+        <link rel="stylesheet" href="./lib/jquery-ui/jquery-ui.min.css">
+        <link rel="stylesheet" href="./lib/codemirror/5.41.0/codemirror.min.css">
+        <link rel="stylesheet" href="./lib/codemirror/5.41.0/addon/hint/show-hint.min.css">
+        <link rel="stylesheet" href="./lib/codemirror/5.41.0/theme/3024-day.min.css">
+        <link rel="stylesheet" href="./lib/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="./lib/datatables/1.10.19/css/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="./lib/css.css">
 
-        <script src="<?php echo $PATH?>lib/jquery.min.js"></script>
-        <script src="<?php echo $PATH?>lib/datatables/1.10.19/js/jquery.dataTables.min.js"></script>
+        <script src="./lib/jquery.min.js"></script>
+        <script src="./lib/datatables/1.10.19/js/jquery.dataTables.min.js"></script>
     </head>
     <style>
         .block-operate {
@@ -61,23 +61,23 @@ $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$c
             <button>确定</button>
             <button>取消</button></div></div>
     <div class="head">
-        <a href="<?php echo $PATH?>" id="nav-home">
-            <img src="<?php echo $PATH?>res/mysql.png"  class="icon home icon-inactive">
-            <img src="<?php echo $PATH?>res/mysql_active.png"  class="icon home icon-active">
+        <a href="./" id="nav-home">
+            <img src="./res/mysql.png"  class="icon home icon-inactive">
+            <img src="./res/mysql_active.png"  class="icon home icon-active">
             &nbsp;概述
         </a>
-        <a href="<?php echo $PATH?>database" id="nav-database">
-            <img src="<?php echo $PATH?>res/database.png"  class="icon database icon-inactive" >
-            <img src="<?php echo $PATH?>res/database_active.png"  class="icon database icon-active">
+        <a href="./database" id="nav-database">
+            <img src="./res/database.png"  class="icon database icon-inactive" >
+            <img src="./res/database_active.png"  class="icon database icon-active">
             &nbsp;数据库
         </a>
-        <a href="<?php echo $PATH?>new-delete-table" id="nav-table">
-            <img src="<?php echo $PATH?>res/table.png"  class="icon table icon-inactive">
-            <img src="<?php echo $PATH?>res/table_active.png"  class="icon table icon-active">
+        <a href="./new-delete-table" id="nav-table">
+            <img src="./res/table.png"  class="icon table icon-inactive">
+            <img src="./res/table_active.png"  class="icon table icon-active">
             &nbsp;数据表
         </a>
-        <a href="<?php echo $PATH."sql"?>" id="nav-sql" class="active">
-            <img src="<?php echo $PATH?>res/sql_active.png"  class="icon sql">
+        <a href="./sql" id="nav-sql" class="active">
+            <img src="./res/sql_active.png"  class="icon sql">
             &nbsp;SQL
         </a>
         <a href="javascript:void(0)" id="exit">X</a>
@@ -106,13 +106,13 @@ $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$c
             </div>
         </div>
     </div>
-    <script src="<?php echo $PATH?>lib/jquery-ui/jquery-ui.js"></script>
-    <script src="<?php echo $PATH?>lib/jquery/jquery.cookie.min.js"></script>
-    <script src="<?php echo $PATH?>lib/codemirror/5.41.0/codemirror.min.js"></script>
-    <script src="<?php echo $PATH?>lib/codemirror/5.41.0/mode/sql/sql.min.js"></script>
-    <script src="<?php echo $PATH?>lib/codemirror/5.41.0/addon/hint/show-hint.min.js"></script>
-    <script src="<?php echo $PATH?>lib/codemirror/5.41.0/addon/hint/sql-hint.min.js"></script>
-    <script src="<?php echo $PATH?>lib/js.js"></script>
+    <script src="./lib/jquery-ui/jquery-ui.js"></script>
+    <script src="./lib/jquery/jquery.cookie.min.js"></script>
+    <script src="./lib/codemirror/5.41.0/codemirror.min.js"></script>
+    <script src="./lib/codemirror/5.41.0/mode/sql/sql.min.js"></script>
+    <script src="./lib/codemirror/5.41.0/addon/hint/show-hint.min.js"></script>
+    <script src="./lib/codemirror/5.41.0/addon/hint/sql-hint.min.js"></script>
+    <script src="./lib/js.js"></script>
     <script>
 
         $(document).ready(function() {
@@ -120,11 +120,11 @@ $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$c
             /* Common Part Start */
             $('.close-body button:first-child').click(function () {
                 $.ajax({
-                    url: '<?php echo $PATH;?>lib/Processing.php',
+                    url: './lib/Processing.php',
                     method: 'post',
                     data: {'type': '2'},
                     success: function () {
-                        window.location.href = '<?php echo $PATH;?>';
+                        window.location.href = './';
                     }
                 });
             });

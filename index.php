@@ -2,7 +2,7 @@
 error_reporting(0);
 include('./lib/settings.php');
 if(!array_key_exists('session', $_COOKIE))
-    header("Location: ".$PATH."login");
+    header("Location: ./login");
 $con_info = json_decode(base64_decode($_COOKIE['session']));
 $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
 ?>
@@ -15,9 +15,9 @@ $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$c
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title><?php echo $PAGE_TITLE_HOME;?></title>
     <link rel="shortcut icon" href="<?php echo $PAGE_ICON;?>">
-    <link rel="stylesheet" href="<?php echo $PATH?>lib/jquery-ui/jquery-ui.min.css">
-    <link rel="stylesheet" href="<?php echo $PATH?>lib/jstree/3.3.5/themes/default/style.min.css">
-    <link rel="stylesheet" href="<?php echo $PATH;?>lib/css.css">
+    <link rel="stylesheet" href="./lib/jquery-ui/jquery-ui.min.css">
+    <link rel="stylesheet" href="./lib/jstree/3.3.5/themes/default/style.min.css">
+    <link rel="stylesheet" href="./lib/css.css">
 </head>
 <style>
 
@@ -34,23 +34,23 @@ $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$c
         <button>确定</button>
         <button>取消</button></div></div>
 <div class="head">
-    <a href="<?php echo $PATH?>" id="nav-home" class="active">
-        <img src="<?php echo $PATH?>res/mysql_active.png"  class="icon home" >
+    <a href="./" id="nav-home" class="active">
+        <img src="./res/mysql_active.png"  class="icon home" >
         &nbsp;概述
     </a>
-    <a href="<?php echo $PATH?>database" id="nav-database">
-        <img src="<?php echo $PATH?>res/database.png"  class="icon database icon-inactive" >
-        <img src="<?php echo $PATH?>res/database_active.png"  class="icon database icon-active">
+    <a href="./database" id="nav-database">
+        <img src="./res/database.png"  class="icon database icon-inactive" >
+        <img src="./res/database_active.png"  class="icon database icon-active">
         &nbsp;数据库
     </a>
-    <a href="<?php echo $PATH?>new-delete-table" id="nav-table">
-        <img src="<?php echo $PATH?>res/table.png"  class="icon table icon-inactive">
-        <img src="<?php echo $PATH?>res/table_active.png"  class="icon table icon-active">
+    <a href="./new-delete-table" id="nav-table">
+        <img src="./res/table.png"  class="icon table icon-inactive">
+        <img src="./res/table_active.png"  class="icon table icon-active">
         &nbsp;数据表
     </a>
-    <a href="<?php echo $PATH."sql"?>" id="nav-sql">
-        <img src="<?php echo $PATH?>res/sql.png"  class="icon sql icon-inactive" >
-        <img src="<?php echo $PATH?>res/sql_active.png"  class="icon sql icon-active">
+    <a href="./sql" id="nav-sql">
+        <img src="./res/sql.png"  class="icon sql icon-inactive" >
+        <img src="./res/sql_active.png"  class="icon sql icon-active">
         &nbsp;SQL
     </a>
     <a href="javascript:void(0)" id="exit">X</a>
@@ -126,7 +126,7 @@ $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$c
     </div>
     <div class="right">
         <div class="block">
-            <div class="block-head">数据库树状图<img id="refresh" src="<?php echo $PATH?>res/refresh.png" width="16px" height="16px" title="刷新"/></div>
+            <div class="block-head">数据库树状图<img id="refresh" src="./res/refresh.png" width="16px" height="16px" title="刷新"/></div>
             <div class="block-body"  style="text-align: left">
                 <div id="tree"></div>
             </div>
@@ -134,21 +134,21 @@ $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$c
 
     </div>
 </div>
-<script src="<?php echo $PATH?>lib/jquery.min.js"></script>
-<script src="<?php echo $PATH?>lib/jquery-ui/jquery-ui.js"></script>
-<script src="<?php echo $PATH?>lib/jquery/jquery.cookie.min.js"></script>
-<script src="<?php echo $PATH?>lib/jstree/3.3.5/jstree.min.js"></script>
-<script src="<?php echo $PATH?>lib/js.js"></script>
+<script src="./lib/jquery.min.js"></script>
+<script src="./lib/jquery-ui/jquery-ui.js"></script>
+<script src="./lib/jquery/jquery.cookie.min.js"></script>
+<script src="./lib/jstree/3.3.5/jstree.min.js"></script>
+<script src="./lib/js.js"></script>
 <script>
 
     $(document).ready(function(){
         $('.close-body button:first-child').click(function () {
             $.ajax({
-                url: '<?php echo $PATH;?>lib/Processing.php',
+                url: './lib/Processing.php',
                 method: 'post',
                 data: {'type': '2'},
                 success: function () {
-                    window.location.href = '<?php echo $PATH;?>';
+                    window.location.href = './';
                 }
             });
         });
@@ -173,12 +173,12 @@ $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$c
                 let parent = $(this).jstree().get_node(node.parents[0]);
                 let db = parent.text;
                 let tb = node.text;
-                window.location.href = '<?php echo $PATH;?>view-edit-table?db='+ db + '&tb=' + tb;
+                window.location.href = './view-edit-table?db='+ db + '&tb=' + tb;
             }
         });
         function loadTree(){
             $.ajax({
-                url: '<?php echo $PATH; ?>lib/api/GetDatabasesTreeView.php',
+                url: './lib/api/GetDatabasesTreeView.php',
                 dataType: 'json',
                 beforeSend: function() {
                     showLoader();

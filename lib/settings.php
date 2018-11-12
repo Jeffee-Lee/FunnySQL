@@ -2,13 +2,13 @@
 error_reporting(0);
 
 // 客户端文件的路径
-$PATH = '/funnysql/';
+//$PATH = '/funnysql/';
 
 // 客户端的名称
 $NAME = "FunnySQL";
 
 // 客户端的图标
-$PAGE_ICON = "{$PATH}res/favicon.png";
+$PAGE_ICON = "./res/favicon.png";
 
 // 客户端各页面的标题
 $PAGE_TITLE_LOGIN = "登录 - {$NAME}";

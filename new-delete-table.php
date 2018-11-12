@@ -1,7 +1,7 @@
 <?php
 include ('./lib/settings.php');
 if(!array_key_exists('session', $_COOKIE))
-    header("Location: ".$PATH."login");
+    header("Location: ./login");
 $con_info = json_decode(base64_decode($_COOKIE['session']));
 $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
 
@@ -31,9 +31,9 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title><?php echo $PAGE_TITLE_TABLE;?></title>
     <link rel="shortcut icon" href="<?php echo $PAGE_ICON;?>">
-    <link rel="stylesheet" href="<?php echo $PATH?>lib/jquery-ui/jquery-ui.min.css">
-    <link rel="stylesheet" href="<?php echo $PATH;?>lib/handsontable/handsontable.full.min.css">
-    <link rel="stylesheet" href="<?php echo $PATH;?>lib/css.css">
+    <link rel="stylesheet" href="./lib/jquery-ui/jquery-ui.min.css">
+    <link rel="stylesheet" href="./lib/handsontable/handsontable.full.min.css">
+    <link rel="stylesheet" href="./lib/css.css">
 </head>
 <style>
     .input {
@@ -51,23 +51,23 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
             <button>确定</button>
             <button>取消</button></div></div>
     <div class="head">
-        <a href="<?php echo $PATH?>" id="nav-home">
-            <img src="<?php echo $PATH?>res/mysql.png"  class="icon home icon-inactive">
-            <img src="<?php echo $PATH?>res/mysql_active.png"  class="icon home icon-active">
+        <a href="./" id="nav-home">
+            <img src="./res/mysql.png"  class="icon home icon-inactive">
+            <img src="./res/mysql_active.png"  class="icon home icon-active">
             &nbsp;概述
         </a>
-        <a href="<?php echo $PATH?>database" id="nav-database">
-            <img src="<?php echo $PATH?>res/database.png"  class="icon database icon-inactive" >
-            <img src="<?php echo $PATH?>res/database_active.png"  class="icon database icon-active">
+        <a href="./database" id="nav-database">
+            <img src="./res/database.png"  class="icon database icon-inactive" >
+            <img src="./res/database_active.png"  class="icon database icon-active">
             &nbsp;数据库
         </a>
-        <a href="<?php echo $PATH?>new-delete-table" id="nav-table" class="active">
-            <img src="<?php echo $PATH?>res/table_active.png"  class="icon table">
+        <a href="./new-delete-table" id="nav-table" class="active">
+            <img src="./res/table_active.png"  class="icon table">
             &nbsp;数据表
         </a>
-        <a href="<?php echo $PATH."sql"?>" id="nav-sql">
-            <img src="<?php echo $PATH?>res/sql.png"  class="icon sql icon-inactive" >
-            <img src="<?php echo $PATH?>res/sql_active.png"  class="icon sql icon-active">
+        <a href="./sql" id="nav-sql">
+            <img src="./res/sql.png"  class="icon sql icon-inactive" >
+            <img src="./res/sql_active.png"  class="icon sql icon-active">
             &nbsp;SQL
         </a>
         <a href="javascript:void(0)" id="exit">X</a>
@@ -108,7 +108,7 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
         
         <div class="right">
             <div class="block">
-                <div class="block-head" id="blockRight1"><?php echo $dba?><img id="refresh" src="<?php echo $PATH?>res/refresh.png" width="16px" height="16px" title="刷新"/></div>
+                <div class="block-head" id="blockRight1"><?php echo $dba?><img id="refresh" src="./res/refresh.png" width="16px" height="16px" title="刷新"/></div>
                 <div class="block-body" >
                     <div id="showDetail"></div>
                 </div>
@@ -120,14 +120,14 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
 
     <div class="more" id="more">&nbsp;&nbsp;更多操作&nbsp;&nbsp;</div>
     <div class="more" id="more-info">
-        <a href="<?php echo $PATH;?>new-delete-table" id="newDelete" class="subMore"> 新建/删除 </a>
-        <a href="<?php echo $PATH;?>view-edit-table" id="viewEdit"  class="subMore"> 查看/编辑 </a>
+        <a href="./new-delete-table" id="newDelete" class="subMore"> 新建/删除 </a>
+        <a href="./view-edit-table" id="viewEdit"  class="subMore"> 查看/编辑 </a>
     </div>
-    <script src="<?php echo $PATH?>lib/jquery.min.js"></script>
-    <script src="<?php echo $PATH?>lib/jquery-ui/jquery-ui.js"></script>
-    <script src="<?php echo $PATH;?>lib/jquery/jquery.cookie.min.js"></script>
-    <script src="<?php echo $PATH?>lib/handsontable/handsontable.full.min.js"></script>
-    <script src="<?php echo $PATH?>lib/js.js"></script>
+    <script src="./lib/jquery.min.js"></script>
+    <script src="./lib/jquery-ui/jquery-ui.js"></script>
+    <script src="./lib/jquery/jquery.cookie.min.js"></script>
+    <script src="./lib/handsontable/handsontable.full.min.js"></script>
+    <script src="./lib/js.js"></script>
     <script>
 
         $(document).ready(function(){
@@ -145,11 +145,11 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
 
             $('.close-body button:first-child').click(function () {
                 $.ajax({
-                    url: '<?php echo $PATH;?>lib/Processing.php',
+                    url: './lib/Processing.php',
                     method: 'post',
                     data: {'type': '2'},
                     success: function () {
-                        window.location.href = '<?php echo $PATH;?>';
+                        window.location.href = './';
                     }
                 });
             });
@@ -161,7 +161,7 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
                 let db = $(this).val();
                 loadDetailTable(db);
                 originalDb = db;
-                window.history.replaceState({},'','<?php echo $PATH.basename(__FILE__,'.php');?>?db='+db);
+                window.history.replaceState({},'','./new-delete-table?db='+db);
 
             });
             // 创建结构表
@@ -265,7 +265,7 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
                         let r = confirm(msg);
                         if(r)
                             $.ajax({
-                                url: '<?php echo $PATH;?>lib/Processing.php?type=3&db=' + db + '&tb=' + tb + '&data=' + data,
+                                url: './lib/Processing.php?type=3&db=' + db + '&tb=' + tb + '&data=' + data,
                                 dataType: 'json',
                                 timeout: 3000,
                                 beforeSend: function () {
@@ -311,7 +311,7 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
                 if(db === undefined)
                     db = '<?php echo $dba;?>';
                 $.ajax({
-                    url: '<?php echo $PATH."lib/Processing.php?type=5&db=";?>'+db,
+                    url: './lib/Processing.php?type=5&db='+db,
                     dataType: 'json',
                     timeout: 3000,
                     beforeSend: function(){
@@ -333,7 +333,7 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
                                 let tb = $(this).attr('tb');
                                 if(confirm('确定删除数据表'+ tb)) {
                                     $.ajax({
-                                        url: '<?php echo $PATH . "lib/Processing.php?type=4&db=";?>'+db+'&tb='+tb,
+                                        url: '。/lib/Processing.php?type=4&db='+db+'&tb='+tb,
                                         dataType: 'json',
                                         timeout: 3000,
                                         success: function (data) {
@@ -347,7 +347,7 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
                                     });
                                 }
                             });
-                            $("#blockRight1").html(db+"<img id=\"refresh\" src=\"<?php echo $PATH?>res/refresh.png\" width=\"16px\" height=\"16px\" title=\"刷新\"/>");
+                            $("#blockRight1").html(db+"<img id=\"refresh\" src=\"./res/refresh.png\" width=\"16px\" height=\"16px\" title=\"刷新\"/>");
                             $('#refresh').click(function () {
                                 loadDetailTable(db);
                             })
