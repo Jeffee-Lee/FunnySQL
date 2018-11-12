@@ -1,7 +1,7 @@
 <?php
 include ('./lib/settings.php');
 if(!array_key_exists('session', $_COOKIE))
-    header("Location: ./login");
+    header("Location: ./login.php");
 $con_info = json_decode(base64_decode($_COOKIE['session']));
 $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
 
@@ -56,16 +56,16 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
             <img src="./res/mysql_active.png"  class="icon home icon-active">
             &nbsp;概述
         </a>
-        <a href="./database" id="nav-database">
+        <a href="./database.php" id="nav-database">
             <img src="./res/database.png"  class="icon database icon-inactive" >
             <img src="./res/database_active.png"  class="icon database icon-active">
             &nbsp;数据库
         </a>
-        <a href="./new-delete-table" id="nav-table" class="active">
+        <a href="./new-delete-table.php" id="nav-table" class="active">
             <img src="./res/table_active.png"  class="icon table">
             &nbsp;数据表
         </a>
-        <a href="./sql" id="nav-sql">
+        <a href="./sql.php" id="nav-sql">
             <img src="./res/sql.png"  class="icon sql icon-inactive" >
             <img src="./res/sql_active.png"  class="icon sql icon-active">
             &nbsp;SQL
@@ -120,8 +120,8 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
 
     <div class="more" id="more">&nbsp;&nbsp;更多操作&nbsp;&nbsp;</div>
     <div class="more" id="more-info">
-        <a href="./new-delete-table" id="newDelete" class="subMore"> 新建/删除 </a>
-        <a href="./view-edit-table" id="viewEdit"  class="subMore"> 查看/编辑 </a>
+        <a href="./new-delete-table.php" id="newDelete" class="subMore"> 新建/删除 </a>
+        <a href="./view-edit-table.php" id="viewEdit"  class="subMore"> 查看/编辑 </a>
     </div>
     <script src="./lib/jquery.min.js"></script>
     <script src="./lib/jquery-ui/jquery-ui.js"></script>
@@ -161,7 +161,7 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
                 let db = $(this).val();
                 loadDetailTable(db);
                 originalDb = db;
-                window.history.replaceState({},'','./new-delete-table?db='+db);
+                window.history.replaceState({},'','./new-delete-table.php?db='+db);
 
             });
             // 创建结构表

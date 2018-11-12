@@ -2,7 +2,7 @@
 error_reporting(0);
 include('./lib/settings.php');
 if(!array_key_exists('session', $_COOKIE))
-    header("Location: ./login");
+    header("Location: ./login.php");
 $con_info = json_decode(base64_decode($_COOKIE['session']));
 $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
 ?>
@@ -38,17 +38,17 @@ $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$c
         <img src="./res/mysql_active.png"  class="icon home" >
         &nbsp;概述
     </a>
-    <a href="./database" id="nav-database">
+    <a href="./database.php" id="nav-database">
         <img src="./res/database.png"  class="icon database icon-inactive" >
         <img src="./res/database_active.png"  class="icon database icon-active">
         &nbsp;数据库
     </a>
-    <a href="./new-delete-table" id="nav-table">
+    <a href="./new-delete-table.php" id="nav-table">
         <img src="./res/table.png"  class="icon table icon-inactive">
         <img src="./res/table_active.png"  class="icon table icon-active">
         &nbsp;数据表
     </a>
-    <a href="./sql" id="nav-sql">
+    <a href="./sql.php" id="nav-sql">
         <img src="./res/sql.png"  class="icon sql icon-inactive" >
         <img src="./res/sql_active.png"  class="icon sql icon-active">
         &nbsp;SQL
@@ -170,7 +170,7 @@ $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$c
                 let parent = $(this).jstree().get_node(node.parents[0]);
                 let db = parent.text;
                 let tb = node.text;
-                window.location.href = './view-edit-table?db='+ db + '&tb=' + tb;
+                window.location.href = './view-edit-table.php?db='+ db + '&tb=' + tb;
             }
         });
         function loadTree(){

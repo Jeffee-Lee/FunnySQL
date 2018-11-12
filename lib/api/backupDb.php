@@ -9,7 +9,7 @@ if(isset($_GET['db']) && !empty($_GET['db'])) {
     $port = $con_info->port;
     $password = $con_info->password;
     $fileName = "Backup_{$db}_".date("Y_m_d_H_i_s").'.sql';
-    $cmd = "{$MYSQL_PATH}mysqldump.exe --user=$user --host=$host --port=$port --password=$password $db";
+    $cmd = "mysqldump.exe --user=$user --host=$host --port=$port --password=$password $db";
 
     header( "Content-Type: application/octet-stream");
     header( 'Content-Disposition: attachment; filename="' . $fileName . '"' );

@@ -1,7 +1,7 @@
 <?php
 include('./lib/settings.php');
 if(!array_key_exists('session', $_COOKIE))
-    header("Location: ./login");
+    header("Location: ./login.php");
 $con_info = json_decode(base64_decode($_COOKIE['session']));
 $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
 ?>
@@ -40,16 +40,16 @@ $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$c
         <img src="./res/mysql_active.png"  class="icon home icon-active">
         &nbsp;概述
     </a>
-    <a href="./database" id="nav-database" class="active">
+    <a href="./database.php" id="nav-database" class="active">
         <img src="./res/database_active.png"  class="icon database">
         &nbsp;数据库
     </a>
-    <a href="./new-delete-table" id="nav-table">
+    <a href="./new-delete-table.php" id="nav-table">
         <img src="./res/table.png"  class="icon table icon-inactive">
         <img src="./res/table_active.png"  class="icon table icon-active">
         &nbsp;数据表
     </a>
-    <a href="./sql" id="nav-sql">
+    <a href="./sql.php" id="nav-sql">
         <img src="./res/sql.png"  class="icon sql icon-inactive" >
         <img src="./res/sql_active.png"  class="icon sql icon-active">
         &nbsp;SQL
