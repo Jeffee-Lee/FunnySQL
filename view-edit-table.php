@@ -539,7 +539,7 @@ if(isset($_GET['p']) and !empty($_GET['p']))
            else {
                if(confirm("确定在表 "+originalTb +' 上的列 '+ indexColumn+' 添加' + typeName[parseInt(indexType)] + ': '+indexName)) {
                    $.ajax({
-                       url: './lib/Processing.php?type=10&db="'+originalDb + '&tb=' + originalTb + '&col='+ indexColumn + '&indexType='+ indexType + '&name=' + indexName,
+                       url: './lib/Processing.php?type=10&db='+originalDb + '&tb=' + originalTb + '&col='+ indexColumn + '&indexType='+ indexType + '&name=' + indexName,
                        dataType: 'json',
                        timeout: 3000,
                        success: function (data) {

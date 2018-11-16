@@ -2,8 +2,6 @@
 include('./lib/settings.php');
 if(!array_key_exists('session', $_COOKIE))
     header("Location: ./login.php");
-$con_info = json_decode(base64_decode($_COOKIE['session']));
-$con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
 
 ?>
     <!doctype html>
@@ -85,8 +83,7 @@ $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$c
 
 
 
-    <div class="main" style="margin: 80px 20px 0 20px; width: auto;">
-
+    <div class="main" style="margin: 80px 20px 0 20px; width: unset;">
         <div class="block" id="editor">
             <div class="block-head">
                 SQL 查询
@@ -116,102 +113,101 @@ $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$c
     <script>
 
         $(document).ready(function() {
-
-            /* Common Part Start */
-            $('.close-body button:first-child').click(function () {
-                $.ajax({
-                    url: './lib/Processing.php',
-                    method: 'post',
-                    data: {'type': '2'},
-                    success: function () {
-                        window.location.href = './';
-                    }
-                });
-            });
-            /* Common Part End */
-
-            $("#editor-lock").click(function () {
-                if($(this).hasClass("fa-lock")) {
-                    $(this).removeClass("fa-lock").addClass("fa-unlock").parent().find("a").unbind("click").removeClass("lock-toggleBody").addClass("toggleBody");
-                } else {
-                    $(this).removeClass("fa-unlock").addClass("fa-lock").parent().find("a").unbind("click").removeClass("toggleBody").addClass("lock-toggleBody");
-                }
-            });
-            var editor = CodeMirror.fromTextArea(document.getElementById("sql-editor"),{
-                lineNumbers: true,
-                mode: {name: "text/x-mysql"},
-                extraKeys: {"Alt": "autocomplete"},
-                theme: "3024-day",
-                autofocus: true
-            });
-            $("#operate-submit").click(function () {
-
-                let sql = editor.getValue().replace(/\t|\r|\n/g," ").split(";").filter(function (el) {
-                    return el !== "" && el.length !==0;
-                });
-                if(sql.length === 0)
-                    showMsg("无输入！");
-                else {
+            setTimeout(function () {
+                /* Common Part Start */
+                $('.close-body button:first-child').click(function () {
                     $.ajax({
                         url: './lib/Processing.php',
-                        method: "post",
-                        data: {'type':"5","sql":sql},
-                        beforeSend: function(){
-                            showLoader();
-                        },
-                        complete: function() {
-                            hideLoader();
-                        },
-                        dataType: "json",
-                        success: function (data) {
-                            if(data.success) {
-                                if(!$("#editor-lock").hasClass("fa-lock"))
-                                    $("#editor .block-body").slideUp(1000,function () {
-                                        if($(this).is(":hidden"))
-                                            $(this).prev("div").css("border-radius","10px").find(".toggleBody").html("展开&nbsp;↓");
-                                        else
-                                            $(this).prev("div").css("border-radius","10px 10px 0 0").find(".toggleBody").html("收起&nbsp;↑");
-                                    });
-                                $("#editor").nextAll().slideUp(1000,function () {
-                                    $(this).remove();
-                                });
-                                data.msg.forEach(function (each) {
-                                    $(".main").append(each);
-                                });
-                            } else
-                                showMsg(data.msg);
+                        method: 'post',
+                        data: {'type': '2'},
+                        success: function () {
+                            window.location.href = './';
                         }
-                    })
-                }
-            }).next().click(function () {
-                editor.setValue("");
-            });
-            $("#editor-undo").click(function () {
-                editor.undo();
-            }).next().click(function () {
-                editor.redo();
-            });
-            setInterval(function () {
-                $(".toggleBody").unbind("click").click(function () {
-                    $(this).parent().parent().next().slideToggle(1000,function () {
-                        if($(this).is(":hidden"))
-                            $(this).prev("div").css("border-radius","10px").find(".toggleBody").html("展开&nbsp;↓");
-                        else
-                            $(this).prev("div").css("border-radius","10px 10px 0 0").find(".toggleBody").html("收起&nbsp;↑");
-                    })
-                });
-                $(".lock-toggleBody").click(function () {
-                    showMsg("收起/展开 编辑框需要先解锁！");
-                });
-                $(".closeBlock").click(function () {
-                    $(this).parent().parent().slideUp(300,function () {
-                        $(this).remove();
                     });
                 });
-            },300);
+                /* Common Part End */
 
+                $("#editor-lock").click(function () {
+                    if($(this).hasClass("fa-lock")) {
+                        $(this).removeClass("fa-lock").addClass("fa-unlock").parent().find("a").unbind("click").removeClass("lock-toggleBody").addClass("toggleBody");
+                    } else {
+                        $(this).removeClass("fa-unlock").addClass("fa-lock").parent().find("a").unbind("click").removeClass("toggleBody").addClass("lock-toggleBody");
+                    }
+                });
+                var editor = CodeMirror.fromTextArea(document.getElementById("sql-editor"),{
+                    lineNumbers: true,
+                    mode: {name: "text/x-mysql"},
+                    extraKeys: {"Alt": "autocomplete"},
+                    theme: "3024-day",
+                    autofocus: true
+                });
+                $("#operate-submit").click(function () {
+
+                    let sql = editor.getValue().replace(/\t|\r|\n/g," ").split(";").filter(function (el) {
+                        return el !== "" && el.length !==0;
+                    });
+                    if(sql.length === 0)
+                        showMsg("无输入！");
+                    else {
+                        $.ajax({
+                            url: './lib/Processing.php',
+                            method: "post",
+                            data: {'type':"5","sql":sql},
+                            beforeSend: function(){
+                                showLoader();
+                            },
+                            complete: function() {
+                                hideLoader();
+                            },
+                            dataType: "json",
+                            success: function (data) {
+                                if(data.success) {
+                                    if(!$("#editor-lock").hasClass("fa-lock"))
+                                        $("#editor .block-body").slideUp(1000,function () {
+                                            if($(this).is(":hidden"))
+                                                $(this).prev("div").css("border-radius","10px").find(".toggleBody").html("展开&nbsp;↓");
+                                            else
+                                                $(this).prev("div").css("border-radius","10px 10px 0 0").find(".toggleBody").html("收起&nbsp;↑");
+                                        });
+                                    $("#editor").nextAll().slideUp(500,function () {
+                                        $(this).remove();
+                                    });
+                                    data.msg.forEach(function (each) {
+                                        $(".main").append(each);
+                                    });
+                                } else
+                                    showMsg(data.msg);
+                            }
+                        })
+                    }
+                }).next().click(function () {
+                    editor.setValue("");
+                });
+                $("#editor-undo").click(function () {
+                    editor.undo();
+                }).next().click(function () {
+                    editor.redo();
+                });
+                setInterval(function () {
+                    $(".toggleBody").unbind("click").click(function () {
+                        $(this).parent().parent().next().slideToggle(1000,function () {
+                            if($(this).is(":hidden"))
+                                $(this).prev("div").css("border-radius","10px").find(".toggleBody").html("展开&nbsp;↓");
+                            else
+                                $(this).prev("div").css("border-radius","10px 10px 0 0").find(".toggleBody").html("收起&nbsp;↑");
+                        })
+                    });
+                    $(".lock-toggleBody").click(function () {
+                        showMsg("收起/展开 编辑框需要先解锁！");
+                    });
+                    $(".closeBlock").click(function () {
+                        $(this).parent().parent().slideUp(300,function () {
+                            $(this).remove();
+                        });
+                    });
+                },100);
+            }, 500)
         });
     </script>
     </body>
     </html>
-<?php $con->close();?>

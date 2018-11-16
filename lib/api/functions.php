@@ -366,7 +366,7 @@ function CreateIndex($db,$tb,$col,$type,$name) {
         $msg = $con->connect_error;
     else {
         $arrIndex = array('0'=>'','1'=>' UNIQUE','2'=>' FULLTEXT','3'=>' SPATIAL');
-        $sql = "CREATE{$arrIndex[$type]} INDEX $name ON $db.$tb($col)";
+        $sql = "CREATE{$arrIndex[$type]} INDEX `$name`` ON $db.$tb(`$col`)";
         $con->query($sql);
         if($con->errno)
             $msg = $con->error;
@@ -688,6 +688,7 @@ function SqlTable($sql,$result,$costTime) {
                     data: data,
                     "scrollX": true,
                     "info": false,
+                    "search": "查找:",
                     "aaSorting": [],
                     "language": {
                         "zeroRecords":    "未匹配到任何结果",
