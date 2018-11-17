@@ -170,7 +170,8 @@ $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$c
                 let parent = $(this).jstree().get_node(node.parents[0]);
                 let db = parent.text;
                 let tb = node.text;
-                window.location.href = './view-edit-table.php?db='+ db + '&tb=' + tb;
+                if(db !=undefined)
+                    window.location.href = './view-edit-table.php?db='+ db + '&tb=' + tb;
             }
         });
         function loadTree(){

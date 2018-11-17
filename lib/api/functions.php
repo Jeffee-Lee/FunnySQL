@@ -132,6 +132,7 @@ function GetDatabaseDetail($databaseName) {
 
     $colHeaders = array('','表名','记录数');
     $columns = array(array('type'=>'text','className'=>'htCenter htMiddle','width'=>20, 'renderer'=>'html'),array('type'=>'text','className'=>'htCenter htMiddle', 'width'=>100, 'renderer'=>'html'),array('type'=>'text','className'=>'htCenter htMiddle', 'width'=>25));
+    $temp = array();
     if($con->connect_errno)
         $msg = $con->connect_error;
     else {
@@ -140,7 +141,6 @@ function GetDatabaseDetail($databaseName) {
         if($con->errno)
             $msg = $con->error;
         else {
-            $temp = array();
             while($row = $result->fetch_assoc()) {
                 $tableName = $row['TABLE_NAME'];
                 array_push($temp, $tableName);
@@ -163,7 +163,13 @@ function GetDatabaseDetail($databaseName) {
         }
     }
     $con->close();
-    return $success?json_encode(array('success'=>$success,'colHeaders'=>$colHeaders,'columns'=>$columns,'data'=>$data)):json_encode(array('success'=>$success,'msg'=>$msg));
+
+    $tbListHtml = '';
+    foreach($temp as $value) {
+        $tbListHtml .= "<option value='$value'>$value</option>";
+    }
+
+    return $success?json_encode(array('success'=>$success,'colHeaders'=>$colHeaders,'columns'=>$columns,'data'=>$data,'tbListHtml'=>$tbListHtml)):json_encode(array('success'=>$success,'msg'=>$msg));
 }
 
 // 删除数据表
@@ -617,7 +623,7 @@ function Sql($sql) {
             $pushArray = "";
             $tSql = $sql[$i];
             $isTableResult = array("show","desc","describe","select");
-            $isMsgResult = array("insert",'update',"alter","start","begin");
+            $isMsgResult = array("insert",'update',"alter","start","begin", "create", 'delete');
             $common = strtolower(array_values(array_filter(explode(' ',$tSql),"strlen"))[0]);
 
             if(in_array($common,$isTableResult)) {
@@ -628,6 +634,75 @@ function Sql($sql) {
                     $pushArray = SqlMsg($tSql,$costTime,"error",$con->error);
                 else {
                     $pushArray = SqlTable($tSql,$result,$costTime);
+                }
+            } else if(in_array($common, $isMsgResult)) {
+                $isTransaction = array("start","begin");
+                if(in_array($common,$isTransaction)) {
+                    $tSql .= ';';
+                    $endTransaction = array('rollback', 'commit');
+                    $i ++;
+                    while($i < count($sql)) {
+                        $common = strtolower(array_values(array_filter(explode(' ',$tSql),"strlen"))[0]);
+                        $tSql .= $sql[$i].';';
+                        if(in_array($common, $endTransaction))
+                            break;
+                        $i ++;
+                    }
+                    $startTime = microtime(true);
+                    $con->query("$tSql");
+                    $costTime = microtime(true) - $startTime;
+                    if($con->errno)
+                        $pushArray = SqlMsg($tSql,$costTime,"error",$con->error);
+                    else {
+                        $pushArray = SqlMsg($tSql,$costTime,"success",'事务操作完成');
+                    }
+                } else {
+                    if($common == 'update') {
+                        $startTime = microtime(true);
+                        $con->query("$tSql");
+                        $costTime = microtime(true) - $startTime;
+                        if($con->errno)
+                            $pushArray = SqlMsg($tSql,$costTime,"error",$con->error);
+                        else {
+                            $pushArray = SqlMsg($tSql,$costTime,"success",'更新语句执行成功');
+                        }
+                    } else if($common == 'insert') {
+                        $startTime = microtime(true);
+                        $con->query("$tSql");
+                        $costTime = microtime(true) - $startTime;
+                        if($con->errno)
+                            $pushArray = SqlMsg($tSql,$costTime,"error",$con->error);
+                        else {
+                            $pushArray = SqlMsg($tSql,$costTime,"success",'插入语句执行成功');
+                        }
+                    } else if($common == 'create') {
+                        $startTime = microtime(true);
+                        $con->query("$tSql");
+                        $costTime = microtime(true) - $startTime;
+                        if($con->errno)
+                            $pushArray = SqlMsg($tSql,$costTime,"error",$con->error);
+                        else {
+                            $pushArray = SqlMsg($tSql,$costTime,"success",'创建语句执行成功');
+                        }
+                    } else if($common == 'alter') {
+                        $startTime = microtime(true);
+                        $con->query("$tSql");
+                        $costTime = microtime(true) - $startTime;
+                        if($con->errno)
+                            $pushArray = SqlMsg($tSql,$costTime,"error",$con->error);
+                        else {
+                            $pushArray = SqlMsg($tSql,$costTime,"success",'修改语句执行成功');
+                        }
+                    } else if($common == 'delete') {
+                        $startTime = microtime(true);
+                        $con->query("$tSql");
+                        $costTime = microtime(true) - $startTime;
+                        if($con->errno)
+                            $pushArray = SqlMsg($tSql,$costTime,"error",$con->error);
+                        else {
+                            $pushArray = SqlMsg($tSql,$costTime,"success",'删除语句执行成功');
+                        }
+                    }
                 }
             } else {
                  $con->query("$tSql");
@@ -640,15 +715,16 @@ function Sql($sql) {
     return json_encode(array('success'=>$success,'msg'=>$msg));
 }
 
+
 function SqlMsg($sql,$costTime,$type,$msg) {
     if($type == "success")
         $headBackgroundColor = "#c5ff8582";
     else
         $headBackgroundColor = "#ff858561";
-    $title = $sql;
+    $title = stripslashes($sql);
     if(strlen($sql) > 20)
         $sql = substr($sql,0,20)."...";
-    return "<div class=\"block\" style=\"margin-top: 30px\"><div class=\"block-head\" style=\"background-color: $headBackgroundColor;\" title='$title'>$sql<span class='closeBlock' title='关闭' style='float: right;margin-left: 20px; margin-right: 10px'>X</span><span title='CostTime' style='float: right'>耗时: $costTime ms</span><div class=\"block-operate\"><a href=\"javascript:void(0)\" style=\"text-decoration: underline dotted;\" class=\"toggleBody\">收起&nbsp;↑</a></div></div><div class=\"block-body\">$msg</div></div>";
+    return "<div class=\"block\" style=\"margin-top: 30px\"><div class=\"block-head\" style=\"background-color: $headBackgroundColor;\" title=\"$title\">$sql<span class='closeBlock' title='关闭' style='float: right;margin-left: 20px; margin-right: 10px'>X</span><span title='CostTime' style='float: right'>耗时: $costTime ms</span><div class=\"block-operate\"><a href=\"javascript:void(0)\" style=\"text-decoration: underline dotted;\" class=\"toggleBody\">收起&nbsp;↑</a></div></div><div class=\"block-body\">$msg</div></div>";
 }
 
 function SqlTable($sql,$result,$costTime) {

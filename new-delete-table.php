@@ -103,6 +103,13 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
                     </div>
                 </div>
             </div>
+            <div class="block" style="margin-top: 30px;">
+                <div class="block-head">备份数据表</div>
+                <div class="block-body">
+                    <select name="backup_tb" title="数据表名" class="input" id="tbList"></select>
+                    <button id="backup">&nbsp;&nbsp;备份&nbsp;&nbsp;</button>
+                </div>
+            </div>
 
         </div>
         
@@ -156,6 +163,11 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
 
             /* Left Part Start */
             let originalDb = '<?php echo $dba;?>';
+
+            function loadTbList(html){
+                $("#tbList").html(html)
+            }
+
             // 选择数据库改变
             $('.select-database').change(function () {
                 let db = $(this).val();
@@ -289,6 +301,11 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
 
             });
 
+            $('#backup').click(function () {
+                let db = originalDb;
+                let tb = $('#tbList').val();
+                window.location = './lib/api/backupTb.php?db=' + db + '&tb=' + tb;
+            });
 
             // Right Part
             let detailTable = new Handsontable(document.getElementById('showDetail'), {
@@ -304,9 +321,6 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
                 disableVisualSelection: true,
             });
             loadDetailTable(originalDb);
-            $(window).resize(function () {
-               loadDetailTable(originalDb);
-            });
             function loadDetailTable(db){
                 if(db === undefined)
                     db = '<?php echo $dba;?>';
@@ -329,24 +343,8 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
                                 columns: columns,
                             });
                             detailTable.loadData(data.data);
-                            $('.delete-table').click(function () {
-                                let tb = $(this).attr('tb');
-                                if(confirm('确定删除数据表'+ tb)) {
-                                    $.ajax({
-                                        url: './lib/Processing.php?type=4&db='+db+'&tb='+tb,
-                                        dataType: 'json',
-                                        timeout: 3000,
-                                        success: function (data) {
-                                            if(data.success) {
-                                                showMsg(data.msg,'success');
-                                                loadDetailTable(db);
-                                            }
-                                            else
-                                                showMsg(data.msg, 'error');
-                                        }
-                                    });
-                                }
-                            });
+                            loadTbList(data.tbListHtml);
+
                             $("#blockRight1").html(db+"<img id=\"refresh\" src=\"./res/refresh.png\" width=\"16px\" height=\"16px\" title=\"刷新\"/>");
                             $('#refresh').click(function () {
                                 loadDetailTable(db);
@@ -358,7 +356,26 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
                 });
             }
 
-
+            setInterval(function () {
+                $('.delete-table').unbind('click').click(function () {
+                    let tb = $(this).attr('tb');
+                    if(confirm('确定删除数据表'+ tb)) {
+                        $.ajax({
+                            url: './lib/Processing.php?type=4&db='+db+'&tb='+tb,
+                            dataType: 'json',
+                            timeout: 3000,
+                            success: function (data) {
+                                if(data.success) {
+                                    showMsg(data.msg,'success');
+                                    loadDetailTable(db);
+                                }
+                                else
+                                    showMsg(data.msg, 'error');
+                            }
+                        });
+                    }
+                });
+            }, 30);
         });
     </script>
 </body>
