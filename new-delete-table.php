@@ -359,6 +359,7 @@ if(isset($_GET['tb']) and !empty($_GET['tb']))
             setInterval(function () {
                 $('.delete-table').unbind('click').click(function () {
                     let tb = $(this).attr('tb');
+                    let db = originalDb;
                     if(confirm('确定删除数据表'+ tb)) {
                         $.ajax({
                             url: './lib/Processing.php?type=4&db='+db+'&tb='+tb,

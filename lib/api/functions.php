@@ -613,7 +613,7 @@ function Sql($sql) {
         $msg = $con->connect_error;
     else
         while(true){
-            if($i == count($sql))
+            if($i >= count($sql))
                 break;
             if(strlen(str_replace(" ","",$sql[$i])) == 0) {
                 $i ++;
@@ -638,23 +638,30 @@ function Sql($sql) {
             } else if(in_array($common, $isMsgResult)) {
                 $isTransaction = array("start","begin");
                 if(in_array($common,$isTransaction)) {
-                    $tSql .= ';';
+                    $arrSql = array();
+                    array_push($arrSql, $tSql);
                     $endTransaction = array('rollback', 'commit');
                     $i ++;
                     while($i < count($sql)) {
+                        $tSql = $sql[$i];
                         $common = strtolower(array_values(array_filter(explode(' ',$tSql),"strlen"))[0]);
-                        $tSql .= $sql[$i].';';
+                        array_push($arrSql,$sql[$i]);
                         if(in_array($common, $endTransaction))
                             break;
                         $i ++;
                     }
+                    $i --;
+                    $tSql = implode(';', $arrSql);
                     $startTime = microtime(true);
-                    $con->query("$tSql");
-                    $costTime = microtime(true) - $startTime;
-                    if($con->errno)
-                        $pushArray = SqlMsg($tSql,$costTime,"error",$con->error);
-                    else {
-                        $pushArray = SqlMsg($tSql,$costTime,"success",'事务操作完成');
+                    foreach ($arrSql as $index=>$value) {
+                        $con->query($value);
+                        $costTime = microtime(true) - $startTime;
+                        if($con->errno) {
+                            $pushArray = SqlMsg($tSql,$costTime,"error",$con->error.' '.$tSql);
+                            break;
+                        }
+                        if($index == count($arrSql) - 1)
+                            $pushArray = SqlMsg($tSql,$costTime,"success",'事务操作完成');
                     }
                 } else {
                     if($common == 'update') {
