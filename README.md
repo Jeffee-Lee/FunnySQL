@@ -28,8 +28,6 @@ git@github.com:Jeffee-Lee/FunnySQL.git
 - 数据库删除
 - 数据库备份，该功能暂时只支持Windows
 
-
-
 ![][db_png]
 
 #### 数据表操作一
@@ -92,11 +90,11 @@ SOFTWARE.
 
 
 
-[main_page_gif]: https://github.com/Jeffee-Lee/FunnySQL/tree/master/img/login_main_page.gif
+[main_page_gif]: https://raw.githubusercontent.com/Jeffee-Lee/FunnySQL/master/img/login_main_page.gif
 
-[db_png]: https://github.com/Jeffee-Lee/FunnySQL/tree/master/img/db.png
-[tb_1_png]: https://github.com/Jeffee-Lee/FunnySQL/tree/master/img/tb_1.png
-[tb_2_png]: https://github.com/Jeffee-Lee/FunnySQL/tree/master/img/tb_2.png
-[sql_gif]: https://github.com/Jeffee-Lee/FunnySQL/tree/master/img/sql.gif
-[leave_gif]: https://github.com/Jeffee-Lee/FunnySQL/tree/master/img/leave.gif
+[db_png]: https://raw.githubusercontent.com/Jeffee-Lee/FunnySQL/master/img/db.png
+[tb_1_png]: https://raw.githubusercontent.com/Jeffee-Lee/FunnySQL/master/img/tb_1.png
+[tb_2_png]: https://raw.githubusercontent.com/Jeffee-Lee/FunnySQL/master/img/tb_2.png
+[sql_gif]: https://raw.githubusercontent.com/Jeffee-Lee/FunnySQL/master/img/sql.gif
+[leave_gif]: https://raw.githubusercontent.com/Jeffee-Lee/FunnySQL/master/img/leave.gif
 
