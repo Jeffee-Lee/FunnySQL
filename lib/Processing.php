@@ -45,6 +45,7 @@ if(isset($_GET['type']) and !empty($_GET['type']) ) {
 if(isset($_POST['type']) and !empty($_POST['type'])) {
     switch ($_POST['type']) {
         case '1':
+//            echo "hello";
             echo SetConnect($_POST['host'],$_POST['port'],$_POST['userName'],$_POST['password']);
             break;
         case '2':

@@ -1,10 +1,12 @@
 <?php
 include "../settings.php";
+session_start();
 /* GET 请求处理函数 */
 // 创建数据库
 function CreateDatabase($databaseName, $collationName) {
-    $con_info = json_decode(base64_decode($_COOKIE['session']));
-    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+//    $con_info = json_decode(base64_decode($_COOKIE['session']));
+//    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+    $con = new mysqli($_SESSION["host"], $_SESSION["userName"], $_SESSION["password"], '', $_SESSION["port"]);
 
     $success = false;
     $msg = '';
@@ -28,8 +30,9 @@ function CreateDatabase($databaseName, $collationName) {
 
 // 删除数据库
 function DeleteDatabase($databaseName) {
-    $con_info = json_decode(base64_decode($_COOKIE['session']));
-    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+//    $con_info = json_decode(base64_decode($_COOKIE['session']));
+//    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+    $con = new mysqli($_SESSION["host"], $_SESSION["userName"], $_SESSION["password"], '', $_SESSION["port"]);
 
     $success = false;
     $msg = '';
@@ -60,8 +63,9 @@ function DeleteDatabase($databaseName) {
 // 创建数据表
 function CreateTable($databaseName, $tableName, $data)
 {
-    $con_info = json_decode(base64_decode($_COOKIE['session']));
-    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+//    $con_info = json_decode(base64_decode($_COOKIE['session']));
+//    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+    $con = new mysqli($_SESSION["host"], $_SESSION["userName"], $_SESSION["password"], '', $_SESSION["port"]);
 
     $success = false;
     $msg = null;
@@ -123,8 +127,9 @@ function CreateTable($databaseName, $tableName, $data)
 }
 // 获取数据库名及编码列表
 function GetDatabaseDetail($databaseName) {
-    $con_info = json_decode(base64_decode($_COOKIE['session']));
-    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+//    $con_info = json_decode(base64_decode($_COOKIE['session']));
+//    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+    $con = new mysqli($_SESSION["host"], $_SESSION["userName"], $_SESSION["password"], '', $_SESSION["port"]);
 
     $success = false;
     $msg = null;
@@ -171,11 +176,11 @@ function GetDatabaseDetail($databaseName) {
 
     return $success?json_encode(array('success'=>$success,'colHeaders'=>$colHeaders,'columns'=>$columns,'data'=>$data,'tbListHtml'=>$tbListHtml)):json_encode(array('success'=>$success,'msg'=>$msg));
 }
-
 // 删除数据表
 function DeleteTable($databaseName, $tableName) {
-    $con_info = json_decode(base64_decode($_COOKIE['session']));
-    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+//    $con_info = json_decode(base64_decode($_COOKIE['session']));
+//    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+    $con = new mysqli($_SESSION["host"], $_SESSION["userName"], $_SESSION["password"], '', $_SESSION["port"]);
 
     $success = false;
     $msg = null;
@@ -195,8 +200,9 @@ function DeleteTable($databaseName, $tableName) {
 }
 // 获取数据表列表，选择框下拉内嵌代码
 function GetTablesList($databaseName) {
-    $con_info = json_decode(base64_decode($_COOKIE['session']));
-    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+//    $con_info = json_decode(base64_decode($_COOKIE['session']));
+//    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+    $con = new mysqli($_SESSION["host"], $_SESSION["userName"], $_SESSION["password"], '', $_SESSION["port"]);
 
     $success = false;
     $msg = '';
@@ -218,9 +224,9 @@ function GetTablesList($databaseName) {
 }
 // 获取数据表的数据
 function LoadTableData($databaseName, $tableName, $page = 1,$limit = 30) {
-    $con_info = json_decode(base64_decode($_COOKIE['session']));
-    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
-
+//    $con_info = json_decode(base64_decode($_COOKIE['session']));
+//    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+    $con = new mysqli($_SESSION["host"], $_SESSION["userName"], $_SESSION["password"], '', $_SESSION["port"]);
 
     $success = false;
     $msg = null;
@@ -300,8 +306,9 @@ function LoadTableData($databaseName, $tableName, $page = 1,$limit = 30) {
 }
 // 删除一条数据记录
 function DeleteTableData($databaseName, $tableName, $condition) {
-    $con_info = json_decode(base64_decode($_COOKIE['session']));
-    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+//    $con_info = json_decode(base64_decode($_COOKIE['session']));
+//    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+    $con = new mysqli($_SESSION["host"], $_SESSION["userName"], $_SESSION["password"], '', $_SESSION["port"]);
 
     $success = false;
     $msg = null;
@@ -324,8 +331,9 @@ function DeleteTableData($databaseName, $tableName, $condition) {
 }
 // 获取数据库列表
 function GetDatabases() {
-    $con_info = json_decode(base64_decode($_COOKIE['session']));
-    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+//    $con_info = json_decode(base64_decode($_COOKIE['session']));
+//    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+    $con = new mysqli($_SESSION["host"], $_SESSION["userName"], $_SESSION["password"], '', $_SESSION["port"]);
 
     $success = false;
     $msg = '';
@@ -362,8 +370,9 @@ function GetDatabases() {
  * @author jeffee
  */
 function CreateIndex($db,$tb,$col,$type,$name) {
-    $con_info = json_decode(base64_decode($_COOKIE['session']));
-    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+//    $con_info = json_decode(base64_decode($_COOKIE['session']));
+//    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+    $con = new mysqli($_SESSION["host"], $_SESSION["userName"], $_SESSION["password"], '', $_SESSION["port"]);
 
     $success = false;
     $msg = null;
@@ -386,8 +395,9 @@ function CreateIndex($db,$tb,$col,$type,$name) {
 }
 
 function AlterDatabase($db,$collation) {
-    $con_info = json_decode(base64_decode($_COOKIE['session']));
-    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+//    $con_info = json_decode(base64_decode($_COOKIE['session']));
+//    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+    $con = new mysqli($_SESSION["host"], $_SESSION["userName"], $_SESSION["password"], '', $_SESSION["port"]);
 
     $success = false;
     $msg = null;
@@ -427,7 +437,13 @@ function SetConnect($host,$port,$userName,$password) {
         if($con->connect_errno)
             $msg = $con->connect_error;
         else {
-            setcookie('session',base64_encode(json_encode(array('host'=>$host,"port"=>$port,"userName"=>$userName,"password"=>$password))),time() + 60*60*24, "/");
+//            setcookie('session',base64_encode(json_encode(array('host'=>$host,"port"=>$port,"userName"=>$userName,"password"=>$password))),time() + 60*60*24, "/");
+
+            $_SESSION["host"] = $host;
+            $_SESSION["port"] = $port;
+            $_SESSION["userName"] = $userName;
+            $_SESSION["password"] = $password;
+
             $success = true;
             $msg = "连接成功！";
         }
@@ -438,7 +454,8 @@ function SetConnect($host,$port,$userName,$password) {
 }
 // 移除连接
 function RemoveConnect(){
-    setcookie('session','',time()-60*60*24,"/");
+    session_destroy();
+//    setcookie('session','',time()-60*60*24,"/");
 }
 
 /**
@@ -452,8 +469,9 @@ function RemoveConnect(){
  * @author jeffee
  */
 function InsertData($db, $tb, $data) {
-    $con_info = json_decode(base64_decode($_COOKIE['session']));
-    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+//    $con_info = json_decode(base64_decode($_COOKIE['session']));
+//    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+    $con = new mysqli($_SESSION["host"], $_SESSION["userName"], $_SESSION["password"], '', $_SESSION["port"]);
 
     $success = false;
     $msg = null;
@@ -541,8 +559,9 @@ function CleanUpData($db, $tb, $column,$value) {
 }
 
 function UpdateData($db,$tb,$beforeChange,$afterChange) {
-    $con_info = json_decode(base64_decode($_COOKIE['session']));
-    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+//    $con_info = json_decode(base64_decode($_COOKIE['session']));
+//    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+    $con = new mysqli($_SESSION["host"], $_SESSION["userName"], $_SESSION["password"], '', $_SESSION["port"]);
 
     $success = false;
     $msg = '';
@@ -604,8 +623,10 @@ function UpdateData($db,$tb,$beforeChange,$afterChange) {
 }
 //echo sql(array("SHOW DATABASES"));
 function Sql($sql) {
-    $con_info = json_decode(base64_decode($_COOKIE['session']));
-    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+//    $con_info = json_decode(base64_decode($_COOKIE['session']));
+//    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+    $con = new mysqli($_SESSION["host"], $_SESSION["userName"], $_SESSION["password"], '', $_SESSION["port"]);
+
     $success = false;
     $msg = array();
     $i = 0;

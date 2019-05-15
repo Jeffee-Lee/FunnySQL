@@ -1,9 +1,13 @@
 <?php
 include('./lib/settings.php');
-if(!array_key_exists('session', $_COOKIE))
-    header("Location: ,/login.php");
-$con_info = json_decode(base64_decode($_COOKIE['session']));
-$con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
+session_start([
+    "gc_maxlifetime"=> 60 * 60 * 24 * 7,
+    "cookie_lifetime"=> 60 * 60 * 24 * 7
+]);
+if(!array_key_exists('host', $_SESSION))
+    header("Location: ./login.php");
+//$con_info = json_decode(base64_decode($_COOKIE['session']));
+$con = new mysqli($_SESSION["host"], $_SESSION["userName"], $_SESSION["password"], '', $_SESSION["port"]);
 
 // 获取数据库列表
 $databases = array();

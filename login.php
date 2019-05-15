@@ -1,4 +1,13 @@
-<?php error_reporting(0); include("./lib/settings.php"); ?>
+<?php
+    error_reporting(0);
+    include("./lib/settings.php");
+
+    session_start([
+        "gc_maxlifetime"=> 60 * 60 * 24 * 7,
+        "cookie_lifetime"=> 60 * 60 * 24 * 7
+    ]);
+    setcookie("PHPSESSID", session_id(), time() + 60 * 60 * 24 * 7, "/");
+?>
 
 <!DOCTYPE html>
 <html>
@@ -9,7 +18,7 @@
     <link rel="stylesheet" href="./lib/google-fonts/spicyrice/css.css">
 
 </head>
-<?php  unset($_COOKIE['session']); setcookie('session',null,-1,"/")?>
+<?php  session_destroy(); ?>
 <style>
     @keyframes fadeInUp{
         0%{
@@ -94,7 +103,6 @@
         right: 0;
         margin: 0 auto;
         width: 500px;
-        display: none;
     }
     #msg-close {
         float: right;
@@ -113,96 +121,123 @@
         animation-duration:1s;
     }
 
+    .errorMsg{
+        background: red;
+    }
 
 
 </style>
 <body>
-    <div id="msg"><span id="msg-body"></span><span id="msg-close" style="cursor: pointer;">X</span></div>
-	<div class="main">
-		<header class="header"><a href="./"><?php echo $NAME;?></a></header>
-		<form onsubmit="return false">
-			<input type="text" name="host" placeholder="IP地址" class="input">
-			<input type="number" name="port" placeholder="端口" value="3306" class="input">
-			<input type="text" name="userName" placeholder="用户名" class="input">
-			<input type="password" name="password" placeholder="密码" class="input">
-			<input type="submit" class="submit" value="连接">
-		</form>
-	</div>
+    <div id="app">
+        <div id="msg" v-show="isShowError" style="display: none;" :class="{'msgShow':isShowError, 'errorMsg':isShowError}">
+            <span id="msg-body">{{ errorMessage }}</span>
+            <span id="msg-close" style="cursor: pointer;" @click="closeError">X</span>
+        </div>
+        <div class="main">
+            <header class="header"><a href="./"><?php echo $NAME;?></a></header>
+            <form @submit.prevent="submit">
+                <input type="text" name="host" placeholder="IP地址" class="input" v-model="host">
+                <input type="number" name="port" placeholder="端口" class="input" v-model="port">
+                <input type="text" name="userName" placeholder="用户名" class="input" v-model="userName">
+                <input type="password" name="password" placeholder="密码" class="input" v-model="password">
+                <input type="submit" class="submit" value="连接">
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.bootcss.com/vue/2.6.10/vue.min.js"></script>
+    <script src="https://cdn.bootcss.com/axios/0.19.0-beta.1/axios.min.js"></script>
 	<script src="./lib/jquery.min.js"></script>
 	<script>
-		$(document).ready(function(){
-            function showMsg(Message, type) {
-                let color = 'red';
-                if(type === undefined || type === 'error')
-                    color = "red";
-                else if (type === 'success')
-                    color = "#00ff2b";
-                if(Message != null) {
-                    $("#msg").css('background',color).addClass("msgShow").find('#msg-body').text(Message).parent('#msg').show();
-                    setTimeout(function(){
-                        $("#msg").removeClass("msgShow").find('#msg-body').text('').parent('#msg').hide();
-                    }, 3333)
-                }
-            }
-            $("#msg-close").click(function () {
-                $("#msg").removeClass("msgShow").hide().find('#msg-body').text('');
-            });
-            $("input[name='host']").focus();
-			$(".submit").click(function(){
-                const $host = $("input[name='host']");
-                const $port = $("input[name='port']");
-                const $userName = $("input[name='userName']");
-                const $password = $("input[name='password']");
-                let host = $host.val();
-                let port = $port.val();
-                let userName = $userName.val();
-                let password = $password.val();
-				if(host === '') {
-				    showMsg("IP地址不能为空！");
-				    $host.focus().select();
-                } else{
-					const patternHost = /^(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)\.(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)\.(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)\.(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)$/;
-                    if(!patternHost.test(host)) {
-					    showMsg("IP地址错误，请重新输入!");
-					    $host.focus().select();
+        let vm = new Vue({
+            el: "#app",
+            data: {
+                isShowError: false,
+                errorMessage: null,
+
+                host: null,
+                port: 3306,
+                userName: null,
+                password: null,
+                focusHost: true
+            },
+            methods: {
+                showError: function (error) {
+                    vm.errorMessage = error;
+                    vm.isShowError = true;
+                    setTimeout(function () {
+                        vm.closeError();
+                    }, 1500)
+                },
+                closeError: function () {
+                    vm.isShowError = false;
+                    vm.errorMessage = null;
+                },
+                submit: function () {
+                    if (!vm.host) {
+                        vm.showError("IP地址不能为空！");
+                        vm.elFocus("input[name='host']");
                     } else {
-                        if(port === '') {
-                            showMsg("端口不能为空！");
-                            $port.focus().select();
+                        const patternHost = /^((25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)\.(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)\.(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)\.(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d))|localhost$/;
+                        if (!patternHost.test(vm.host)) {
+                            vm.showError("IP地址格式错误，请重新输入!");
+                            vm.elFocus("input[name='host']").elSelect("input[name='host']");
                         } else {
-                            const patternPort = /^(\d|[1-9]\d{1,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5])$/g;
-                            if(!patternPort.test(port)) {
-                                showMsg("端口错误，请重新输入！");
-                                $port.focus().select();
+                            if (!vm.port) {
+                                vm.showError("端口不能为空！");
+                                vm.elFocus("input[name='port']");
                             } else {
-                                if(userName === '') {
-                                    showMsg('用户名不能为空！');
-                                    $userName.focus().select();
+                                const patternPort = /^\d|[1-9]\d{1,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5]$/g;
+                                if (!patternPort.test(vm.port)) {
+                                    vm.showError("端口错误，请重新输入!");
+                                    vm.elFocus("input[name='port']").elSelect("input[name='port']");
                                 } else {
-                                    $.ajax({
-                                        url: "./lib/Processing.php",
-                                        type: "post",
-                                        dataType: "json",
-                                        timeout: 3000,
-                                        data: {'type': '1','host':host,'port':port,'userName':userName,'password':password},
-                                        success:function(data){
-                                            if(data.success) {
+                                    if (!vm.userName) {
+                                        vm.showError("用户名不能为空！");
+                                    } else {
+                                        let params = new URLSearchParams();
+                                        params.append("type", "1");
+                                        params.append("host", vm.host);
+                                        params.append("port", vm.port);
+                                        params.append("userName", vm.userName);
+                                        params.append("password", vm.password);
+                                        axios({
+                                            method: "POST",
+                                            url: "./lib/Processing.php",
+                                            data: params.toString()
+                                        }).then(function (response) {
+                                            let data = response.data;
+                                            if (data.success) {
                                                 window.location.href = ".";
                                             } else {
-                                                showMsg(data.msg);
+                                                vm.showError(data.msg);
                                             }
-                                        },
-                                        error:  function(){
-                                            showMsg('连接超时，请稍后重试！');
-                                        }
-                                    });
+                                        }).catch(function (error) {
+                                            vm.showError(error);
+                                        })
+
+                                    }
                                 }
                             }
                         }
                     }
+                },
+                elFocus: function (el) {
+                    document.querySelector(el).focus();
+                    return vm;
+                },
+                elSelect: function (el) {
+                    document.querySelector(el).select();
+                    return vm;
                 }
-			});
-		});
+            },
+            created: function() {
+                this.$nextTick(function () {
+                    vm.elFocus("input[name='host']");
+                })
+            },
+        });
+
 	</script>
 </body>
 </html>
