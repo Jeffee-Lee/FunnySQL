@@ -9,7 +9,6 @@ function CreateDatabase($databaseName, $collationName) {
     $con = new mysqli($_SESSION["host"], $_SESSION["userName"], $_SESSION["password"], '', $_SESSION["port"]);
 
     $success = false;
-    $msg = '';
     if($con->connect_errno) {
         $msg = $con->connect_error;
     } else if($con->select_db($databaseName)) {
@@ -84,7 +83,7 @@ function CreateTable($databaseName, $tableName, $data)
             $data = explode(',', $data);
             $key = array();
             $countColumns = count($data) / 5;
-            $sql = 'CREATE TABLE ' . $tableName . '(';
+            $sql = 'CREATE TABLE `' . $tableName . '`(';
             for ($i = 0; $i < $countColumns; $i++) {
                 $name = $data[$i * 5];
                 $type = $data[$i * 5 + 1];
@@ -169,12 +168,13 @@ function GetDatabaseDetail($databaseName) {
     }
     $con->close();
 
-    $tbListHtml = '';
+    $tbList = array();
     foreach($temp as $value) {
-        $tbListHtml .= "<option value='$value'>$value</option>";
+        array_push($tbList, $value);
     }
 
-    return $success?json_encode(array('success'=>$success,'colHeaders'=>$colHeaders,'columns'=>$columns,'data'=>$data,'tbListHtml'=>$tbListHtml)):json_encode(array('success'=>$success,'msg'=>$msg));
+    return $success?json_encode(array('success'=>$success,'colHeaders'=>$colHeaders,
+        'columns'=>$columns,'data'=>$data,'tbList'=>$tbList)):json_encode(array('success'=>$success,'msg'=>$msg));
 }
 // 删除数据表
 function DeleteTable($databaseName, $tableName) {
@@ -278,8 +278,7 @@ function LoadTableData($databaseName, $tableName, $page = 1,$limit = 30) {
                 $msg = $con->error;
             } else {
                 $success = true;
-
-                 $count = 0;
+                $count = 0;
                 while($row = $result->fetch_assoc()) {
 
                     $list = array("<a href='javascript:void(0)' class='edit editData' row='$count'>编辑</a>","<a href='javascript:void(0)' class='deleteData delete'column='$count'>删除</a>");
@@ -317,7 +316,7 @@ function DeleteTableData($databaseName, $tableName, $condition) {
     if($con->connect_errno)
         $msg = $con->connect_error;
     else {
-        $sql = "DELETE FROM $databaseName.$tableName WHERE $condition";
+        $sql = "DELETE FROM `$databaseName`.`$tableName` WHERE $condition";
         $con->query($sql);
         if($con->errno)
             $msg = $con->error;
@@ -338,7 +337,7 @@ function GetDatabases() {
     $success = false;
     $msg = '';
     $data = array();
-    $dbList = "";
+    $dbList = array();
     if($con->connect_errno)
         $msg = $con->connect_error;
     else {
@@ -349,7 +348,7 @@ function GetDatabases() {
         else {
             $success = true;
             while($row = $result->fetch_assoc()) {
-                $dbList .= "<option value='{$row['SCHEMA_NAME']}'>{$row['SCHEMA_NAME']}</option>";
+                array_push($dbList, $row['SCHEMA_NAME']);
                 array_push($data, array('<a href="javascript:void(0)" class="deleteDatabase delete" db="'.$row['SCHEMA_NAME'].'">删除</a>',"<a href='./new-delete-table.php?db=".$row['SCHEMA_NAME']."' title='访问数据库 ".$row['SCHEMA_NAME']."' class='access'>".$row['SCHEMA_NAME']."</a>",$row['DEFAULT_COLLATION_NAME']));
             }
         }
@@ -411,7 +410,7 @@ function AlterDatabase($db,$collation) {
             $msg = $con->error;
         else {
             $success = true;
-            $msg = '编码创建成功！';
+            $msg = '编码修改成功！';
         }
     }
     $con->close();
@@ -463,7 +462,7 @@ function RemoveConnect(){
  *
  * @param $db string 数据库名
  * @param $tb string 数据表名
- * @param $data array 二维数组，插入数据的集合，数组中每一项为一个整条插入的数据
+ * @param $data string 二维数组，插入数据的集合，数组中每一项为一个整条插入的数据
  * @return string
  *
  * @author jeffee
@@ -475,48 +474,40 @@ function InsertData($db, $tb, $data) {
 
     $success = false;
     $msg = null;
-
+    $data = json_decode($data);
     if($con->connect_errno) {
         $msg = $con->connect_error;
     } else {
         if(!$con->select_db($db))
             $msg = "不存在数据库$db";
         else {
-            $result = $con->query("DESC $tb");
-            if($con->errno)
+            $result = $con->query("DESC `$tb`");
+            if($con->errno) {
                 $msg = $con->error;
-            else {
-                $columns = array();
-                while($row = $result->fetch_assoc())
-                    array_push($columns, $row['Field']);
-                $strColumns = implode(',',$columns);
+            } else {
+                $strColumns = "";
+                while($row = $result->fetch_assoc()) {
+                    $strColumns .= sprintf("`%s`,", $row['Field']);
+                }
+                $strColumns = substr($strColumns, 0, strlen($strColumns) - 1);
+//                $strColumns = implode(',',$columns);
                 $arrValue = array();
                 foreach ($data as $value){
                     $temp = array();
-
                     foreach ($value as $index =>$column) {
-                        array_push($temp, CleanUpData($db, $tb, $columns[$index], $column));
+                        array_push($temp, ($column == null)?'NULL': sprintf('"%s"', $column));
+//                        array_push($temp, CleanUpData($db, $tb, $columns[$index], $column));
                     }
                     array_push($arrValue, '('.implode(',',$temp).')');
                 }
-                $con->query('set autocommit=0');
-                $con->begin_transaction();
-                $insertSuccess = true;
-
-                foreach ($arrValue as $index=>$item) {
-                    $con->query("INSERT INTO $tb($strColumns) VALUES $item");
-                    if($con->errno) {
-                        $insertSuccess = false;
-                        $msg .= $con->error.'<br>';
-                    }
-                }
-                if($insertSuccess) {
-                    $success = true;
-                    $msg = '数据插入成功！';
-                    $con->commit();
+                $insertValues = implode(  ",", $arrValue);
+                $sql = sprintf("INSERT INTO `%s`.`%s`(%s) VALUES %s;", $db, $tb, $strColumns, $insertValues);
+                $con->query($sql);
+                if ($con->errno) {
+                    $msg = $con->error;
                 } else {
-                    $msg = substr($msg,0, strlen($msg) -4);
-                    $con->rollback();
+                    $success = true;
+                    $msg = "数据插入成功！";
                 }
             }
         }
@@ -559,74 +550,57 @@ function CleanUpData($db, $tb, $column,$value) {
 }
 
 function UpdateData($db,$tb,$beforeChange,$afterChange) {
-//    $con_info = json_decode(base64_decode($_COOKIE['session']));
-//    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
     $con = new mysqli($_SESSION["host"], $_SESSION["userName"], $_SESSION["password"], '', $_SESSION["port"]);
 
     $success = false;
-    $msg = '';
-    if($con->connect_errno)
-        $msg = $con->connect_error;
-    else {
-        if(!$con->select_db($db))
-            $msg = "不存在数据库$db";
-        else {
-            $result = $con->query("DESC $tb");
-            if ($con->errno)
-                $msg = $con->error;
-            else {
-                $columns = array();
-                while ($row = $result->fetch_assoc())
-                    array_push($columns, $row['Field']);
-                $arrBeforeChange = array();
-                foreach ($beforeChange as $index =>$value) {
-                    array_push($arrBeforeChange, CleanUpData($db, $tb, $columns[$index], $value));
-                }
-                $condition = '';
-                foreach ($columns as $index => $value)
-                    $condition .= $value.'='.$arrBeforeChange[$index].' and ';
-                $condition = substr($condition, 0, strlen($condition)-4);
-                $arrAfterChange = array();
-                foreach ($afterChange as $index=>$value) {
-                    array_push($arrAfterChange, CleanUpData($db, $tb, $columns[$index], $value));
-                }
-                $con->query('set autocommit=0');
-                $con->begin_transaction();
-                $updateSuccess = true;
-                foreach ($arrAfterChange as $index=>$value) {
-                    $sql = "UPDATE $tb SET ".$columns[$index].'='.$value." WHERE $condition";
-                    $con->query($sql);
-                    if($con->errno) {
-                        $updateSuccess = false;
-                        $msg .= $con->error;
-                        break;
-                    } else {
-                        $arrBeforeChange[$index] = $value;
-                        $condition = '';
-                        foreach ($columns as $i => $v)
-                            $condition .= $v.'='.$arrBeforeChange[$i].' and ';
-                        $condition = substr($condition, 0, strlen($condition)-4);
-                    }
-                }
-                if($updateSuccess) {
-                    $success = true;
-                    $msg = "数据更新成功！";
-                    $con->commit();
+    if (! strcmp($beforeChange, $afterChange)) {
+        $msg = "记录并未更改！";
+    } else {
+        if($con->connect_errno) {
+            $msg = $con->connect_error;
+        } else {
+            if(!$con->select_db($db)) {
+                $msg = "不存在数据库$db";
+            } else {
+                $result = $con->query("DESC $tb");
+                if ($con->errno) {
+                    $msg = $con->error;
                 } else {
-                    $con->rollback();
+                    $beforeChange = json_decode($beforeChange);
+                    $afterChange = json_decode($afterChange);
+
+                    $columns = array();
+                    while ($row = $result->fetch_assoc()) {
+                        array_push($columns, $row['Field']);
+                    }
+
+                    $condition = '';
+                    $innerSql = "";
+                    foreach ($columns as $index => $value) {
+                        $condition .= sprintf('`%s`="%s" and ', $value, $beforeChange[$index]);
+                        $innerSql .= sprintf('`%s`="%s",', $value, $afterChange[$index]);
+                    }
+                    $condition = substr($condition, 0, strlen($condition) - 5);
+                    $innerSql = substr($innerSql, 0, strlen($innerSql) - 1);
+
+                    $sql = sprintf("UPDATE `%s`.`%s` SET %s WHERE %s;", $db, $tb, $innerSql, $condition);
+                    $con->query($sql);
+                    if ($con->errno) {
+                        $msg = $con->error;
+                    } else {
+                        $success = true;
+                        $msg = "数据更新成功！";
+                    }
                 }
             }
         }
     }
+
     $con->close();
     return json_encode(array('success'=>$success,'msg'=>$msg));
 }
 //echo sql(array("SHOW DATABASES"));
-function Sql($sql) {
-//    $con_info = json_decode(base64_decode($_COOKIE['session']));
-//    $con = new mysqli($con_info->host,$con_info->userName, $con_info->password,'',$con_info->port);
-    $con = new mysqli($_SESSION["host"], $_SESSION["userName"], $_SESSION["password"], '', $_SESSION["port"]);
-
+function Sql($sql) {$con = new mysqli($_SESSION["host"], $_SESSION["userName"], $_SESSION["password"], '', $_SESSION["port"]);
     $success = false;
     $msg = array();
     $i = 0;
@@ -646,7 +620,6 @@ function Sql($sql) {
             $isTableResult = array("show","desc","describe","select");
             $isMsgResult = array("insert",'update',"alter","start","begin", "create", 'delete');
             $common = strtolower(array_values(array_filter(explode(' ',$tSql),"strlen"))[0]);
-
             if(in_array($common,$isTableResult)) {
                 $startTime = microtime(true);
                 $result = $con->query("$tSql");
@@ -733,15 +706,14 @@ function Sql($sql) {
                     }
                 }
             } else {
-                 $con->query("$tSql");
+                $con->query("$tSql");
                 if($con->errno)
                     $pushArray = SqlMsg($tSql,0,"error",$con->error);
             }
             array_push($msg,$pushArray);
             $i ++;
         }
-    return json_encode(array('success'=>$success,'msg'=>$msg));
-}
+    return json_encode(array('success'=>$success,'msg'=>$msg));}
 
 
 function SqlMsg($sql,$costTime,$type,$msg) {

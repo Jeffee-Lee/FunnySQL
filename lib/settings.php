@@ -14,3 +14,4 @@ $PAGE_TITLE_HOME = "概述 - {$NAME}";
 $PAGE_TITLE_DATABASE = "数据库 - {$NAME}";
 $PAGE_TITLE_TABLE = "数据库 - {$NAME}";
 $PAGE_TITLE_SQL = "SQL - {$NAME}";
+$PAGE_TITLE_Toolbox = "工具箱 - {$NAME}";

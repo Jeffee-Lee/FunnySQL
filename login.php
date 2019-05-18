@@ -130,7 +130,7 @@
 <body>
     <div id="app">
         <div id="msg" v-show="isShowError" style="display: none;" :class="{'msgShow':isShowError, 'errorMsg':isShowError}">
-            <span id="msg-body">{{ errorMessage }}</span>
+            <span id="msg-body">{{ message }}</span>
             <span id="msg-close" style="cursor: pointer;" @click="closeError">X</span>
         </div>
         <div class="main">
@@ -153,7 +153,7 @@
             el: "#app",
             data: {
                 isShowError: false,
-                errorMessage: null,
+                message: null,
 
                 host: null,
                 port: 3306,
@@ -163,7 +163,7 @@
             },
             methods: {
                 showError: function (error) {
-                    vm.errorMessage = error;
+                    vm.message = error;
                     vm.isShowError = true;
                     setTimeout(function () {
                         vm.closeError();
@@ -171,7 +171,7 @@
                 },
                 closeError: function () {
                     vm.isShowError = false;
-                    vm.errorMessage = null;
+                    vm.message = null;
                 },
                 submit: function () {
                     if (!vm.host) {

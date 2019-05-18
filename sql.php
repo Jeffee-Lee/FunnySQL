@@ -55,36 +55,50 @@ if(!array_key_exists('host', $_SESSION))
         }
     </style>
     <body>
-    <div id="msg"><span id="msg-body"></span><span id="msg-close" style="cursor: pointer;">X</span></div>
-    <div id="loader"></div>
-    <div id="fullScreen"></div>
-    <div id="close"><div class="close-head">确定离开？<a >X</a ></div>
-        <div class="close-body">
-            <button>确定</button>
-            <button>取消</button></div></div>
-    <div class="head">
-        <a href="./" id="nav-home">
-            <img src="./res/mysql.png"  class="icon home icon-inactive">
-            <img src="./res/mysql_active.png"  class="icon home icon-active">
-            &nbsp;概述
-        </a>
-        <a href="./database.php" id="nav-database">
-            <img src="./res/database.png"  class="icon database icon-inactive" >
-            <img src="./res/database_active.png"  class="icon database icon-active">
-            &nbsp;数据库
-        </a>
-        <a href="./new-delete-table.php" id="nav-table">
-            <img src="./res/table.png"  class="icon table icon-inactive">
-            <img src="./res/table_active.png"  class="icon table icon-active">
-            &nbsp;数据表
-        </a>
-        <a href="./sql.php" id="nav-sql" class="active">
-            <img src="./res/sql_active.png"  class="icon sql">
-            &nbsp;SQL
-        </a>
-        <a href="javascript:void(0)" id="exit">X</a>
-    </div>
 
+    <div id="common">
+        <div id="msg" v-show="isMsgShow" style="display: none;" :class="{'msgShow':isMsgShow, 'errorMsg':isShowError, 'successMsg': isShowSuccess}">
+            <span id="msg-body">{{ message }}</span>
+            <span id="msg-close" style="cursor: pointer;" @click="hideMsg">X</span>
+        </div>
+        <div id="loader" style="display: none;" v-show="isShowLoader"></div>
+        <div id="fullScreen" v-show="isShowClose" style="display: none;"></div>
+        <div id="close" v-show="isShowClose" style="display: none">
+            <div class="close-head">确定离开？<span title="关闭" @click="hideClose">X</span></div>
+            <div class="close-body">
+                <button @click="logout">确定</button>
+                <button @click="hideClose">取消</button>
+            </div>
+        </div>
+        <div class="head">
+            <a href="./" id="nav-home">
+                <img src="./res/mysql.png"  class="icon home icon-inactive">
+                <img src="./res/mysql_active.png"  class="icon home icon-active">
+                &nbsp;概述
+            </a>
+            <a href="./database.php" id="nav-database">
+                <img src="./res/database.png"  class="icon database icon-inactive" >
+                <img src="./res/database_active.png"  class="icon database icon-active">
+                &nbsp;数据库
+            </a>
+            <a href="./new-delete-table.php" id="nav-table">
+                <img src="./res/table.png"  class="icon table icon-inactive">
+                <img src="./res/table_active.png"  class="icon table icon-active">
+                &nbsp;数据表
+            </a>
+            <a href="./sql.php" id="nav-sql" class="active">
+                <img src="./res/sql.png"  class="icon sql icon-inactive" >
+                <img src="./res/sql_active.png"  class="icon sql icon-active">
+                &nbsp;SQL
+            </a>
+            <a href="./toolbox.php" id="nav-backup">
+                <img src="./res/backup.png"  class="icon backup icon-inactive" >
+                <img src="./res/backup_active.png"  class="icon backup icon-active">
+                &nbsp;工具箱
+            </a>
+            <span id="exit" title="退出" @click="showClose">X</span>
+        </div>
+    </div>
 
 
     <div class="main" style="margin: 80px 20px 0 20px; width: unset;">
@@ -107,29 +121,19 @@ if(!array_key_exists('host', $_SESSION))
             </div>
         </div>
     </div>
-    <script src="./lib/jquery-ui/jquery-ui.js"></script>
-    <script src="./lib/jquery/jquery.cookie.min.js"></script>
+
     <script src="./lib/codemirror/5.41.0/codemirror.min.js"></script>
     <script src="./lib/codemirror/5.41.0/mode/sql/sql.min.js"></script>
     <script src="./lib/codemirror/5.41.0/addon/hint/show-hint.min.js"></script>
     <script src="./lib/codemirror/5.41.0/addon/hint/sql-hint.min.js"></script>
+    <script src="./lib/vue.min.js"></script>
+    <script src="./lib/axios.min.js"></script>
     <script src="./lib/js.js"></script>
+
     <script>
 
         $(document).ready(function() {
             setTimeout(function () {
-                /* Common Part Start */
-                $('.close-body button:first-child').click(function () {
-                    $.ajax({
-                        url: './lib/Processing.php',
-                        method: 'post',
-                        data: {'type': '2'},
-                        success: function () {
-                            window.location.href = './';
-                        }
-                    });
-                });
-                /* Common Part End */
 
                 $("#editor-lock").click(function () {
                     if($(this).hasClass("fa-lock")) {
@@ -151,17 +155,17 @@ if(!array_key_exists('host', $_SESSION))
                         return el !== "" && el.length !==0;
                     });
                     if(sql.length === 0)
-                        showMsg("无输入！");
+                        common.showError("无输入！");
                     else {
                         $.ajax({
                             url: './lib/Processing.php',
                             method: "post",
                             data: {'type':"5","sql":sql},
                             beforeSend: function(){
-                                showLoader();
+                                common.showLoader();
                             },
                             complete: function() {
-                                hideLoader();
+                                common.hideLoader();
                             },
                             dataType: "json",
                             success: function (data) {
@@ -180,7 +184,7 @@ if(!array_key_exists('host', $_SESSION))
                                         $(".main").append(each);
                                     });
                                 } else
-                                    showMsg(data.msg);
+                                    common.showError(data.msg);
                             }
                         })
                     }
@@ -202,7 +206,7 @@ if(!array_key_exists('host', $_SESSION))
                         })
                     });
                     $(".lock-toggleBody").click(function () {
-                        showMsg("收起/展开 编辑框需要先解锁！");
+                        common.showError("收起/展开 编辑框需要先解锁！");
                     });
                     $(".closeBlock").click(function () {
                         $(this).parent().parent().slideUp(300,function () {

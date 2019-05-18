@@ -18,6 +18,10 @@ button:hover {
 button:active {
     background: #d3fffb;
 }
+button:disabled, button:disabled:hover, button:disabled:active {
+    background: #cdcdcd1f;
+    cursor: not-allowed;
+}
 a {
     text-decoration: none;
 }
@@ -48,6 +52,9 @@ a {
     margin-right: .3em;
     vertical-align: -3px;
 }
+.head > .active > img.icon-inactive {
+    display: none;
+}
 .head > a:not(.active) > img.icon-active {
     display: none;
 }
@@ -74,10 +81,16 @@ a {
     border-bottom-color: #311B92;
     color: #311B92;
 }
+#nav-backup:hover, #nav-backup.active {
+    border-bottom-color: #FFC66F;
+    color: #FFC66F;
+}
 #exit {
     float: right;
     border: inset transparent;
     vertical-align: middle;
+    padding: .5em 1.2em .5em 1.2em;
+    cursor: pointer;
 }
 #exit:hover {
     background: red;
@@ -95,7 +108,6 @@ a {
     position: fixed;
     top: 0;
     left: 0;
-    display: none;
 }
 #close {
     position: fixed;
@@ -106,7 +118,6 @@ a {
     background: white;
     border: 1px solid #0374ff8c;
     box-shadow: 4px 7px #80808080;
-    display: none;
 }
 .close-head {
     cursor: default;
@@ -115,7 +126,7 @@ a {
     font-size: 17px;
     border-bottom: 1px solid #d9d9d9;
 }
-.close-head a {
+.close-head span {
     float: right;
     margin: -10px;
     padding: 7px;
@@ -123,11 +134,11 @@ a {
     cursor: pointer;
     border: inset transparent;
 }
-.close-head a:hover {
+.close-head span:hover {
     background: red;
     color: white;
 }
-.close-head a:active {
+.close-head span:active {
     background: #ff6f6d;
 }
 .close-body {
@@ -165,7 +176,6 @@ a {
 
 
 #loader {
-    display: none;
     position: fixed;
     top: 45%;
     left: 45%;
@@ -203,7 +213,6 @@ a {
     right: 0;
     margin: 0 auto;
     width: 500px;
-    display: none;
 }
 #msg-close {
     float: right;
@@ -220,6 +229,12 @@ a {
 .msgShow{
     animation-name:fadeInUp;
     animation-duration:1s;
+}
+.errorMsg{
+    background: red;
+}
+.successMsg {
+    background: #00ff2b;
 }
 @keyframes fadeInUp{
     0%{
@@ -367,6 +382,7 @@ a {
     border: inset transparent;
 }
 #editClose:hover {
+    border-top-right-radius: 10px;
     background: red;
     color: white;
 }
@@ -435,32 +451,38 @@ a {
 }
 
 @keyframes bounceInUp {
-  from,
-  60%,
-  75%,
-  90%,
-  to {
-    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
-  }
-  from {
-    opacity: 0;
-    transform: translate3d(0, 3000px, 0);
-  }
+    from,
+    60%,
+    75%,
+    90%,
+    to {
+        animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    }
+    from {
+        opacity: 0;
+        transform: translate3d(0, 3000px, 0);
+    }
 
-  60% {
-    opacity: 1;
-    transform: translate3d(0, -20px, 0);
-  }
+    60% {
+        opacity: 1;
+        transform: translate3d(0, -20px, 0);
+    }
 
-  75% {
-    transform: translate3d(0, 10px, 0);
-  }
+    75% {
+        transform: translate3d(0, 10px, 0);
+    }
 
-  90% {
-    transform: translate3d(0, -5px, 0);
-  }
+    90% {
+        transform: translate3d(0, -5px, 0);
+    }
 
-  to {
-    transform: translate3d(0, 0, 0);
-  }
+    to {
+        transform: translate3d(0, 0, 0);
+    }
+}
+select, option{
+    cursor: pointer;
+}
+select:disabled {
+    cursor: not-allowed;
 }
